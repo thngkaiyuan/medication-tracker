@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Medication Tracker</title>
+    <meta name="theme-color" content="#92A3A7">
+    <style>
+        :root {
+            --primary-bg: white;
+            --text-color-main: #2F2F2F;
+            --text-color-header: #4A4A4A;
+            --text-color-subheader: #8A8A8A;
+            --text-color-light: #6A6A6A;
+            --text-color-medication-name: white;
+            --text-color-medication-status: rgba(255, 255, 255, 0.85);
+            --border-color-light: #EEEEEE;
+            --border-color-input: #E0E0E0;
+            --accent-color: #92A3A7;
+            --action-color-undo: #C49999; 
+            --action-color-redo: #92A3A7; 
+            --disabled-color: #CCCCCC;
+            --modal-backdrop-color: rgba(0, 0, 0, 0.4);
+            --toast-bg: rgba(74, 74, 74, 0.9);
+            
+            --font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            --base-font-weight: 300;
+
+            --transition-duration: 0.3s;
+            --transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-transform: transform var(--transition-duration) var(--transition-timing-function);
+
+            --safe-gradient-start: #2E7D32;
+            --safe-gradient-end: #4CAF50;
+            --recent-gradient-start: #E65100;
+            --recent-gradient-end: #FF9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-system);
+            background: var(--primary-bg);
+            color: var(--text-color-main);
+            line-height: 1.6;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            overflow-x: hidden; 
+            font-weight: var(--base-font-weight);
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden; 
+            position: relative;
+        }
+
+        .main-screen, .records-screen {
+            width: 100%;
+            height: 100%; 
+            background: var(--primary-bg);
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex; 
+            flex-direction: column;
+            transition: transform var(--transition-duration) var(--transition-timing-function);
+        }
+
+        .main-screen {
+            z-index: 5; 
+            transform: translateX(0);
+        }
+        
+        .main-screen.viewing-records {
+            transform: translateX(-100%);
+        }
+
+        .records-screen {
+            transform: translateX(100%); 
+            z-index: 10; 
+        }
+
+        .records-screen.active { 
+            transform: translateX(0);
+        }
+
+        .container, .records-container { 
+            width: 100%;
+            padding: 0; 
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 20px 20px 32px; 
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-header);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .medications-list {
+            flex: 1; 
+            overflow-y: auto; 
+            padding-bottom: 20px; 
+        }
+
+        .medication-item {
+            position: relative;
+            border-bottom: 1px solid var(--border-color-light);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .medication-item:last-child {
+            border-bottom: none;
+        }
+
+        .medication-swipe-actions {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; 
+            z-index: 1; 
+            padding: 0 20px;
+            color: var(--text-color-medication-name); 
+            opacity: 0; 
+            transition: opacity 0.15s ease-in-out;
+            pointer-events: none; 
+        }
+        .medication-item.swiping-right .medication-swipe-actions {
+            opacity: 0.8;
+        }
+
+        .swipe-action-text {
+            font-weight: 500;
+            font-size: 16px;
+            text-transform: uppercase;
+        }
+
+        .medication-content-wrapper {
+            position: relative;
+            z-index: 2; 
+            background: inherit; 
+            transition: transform 0.2s ease-out; 
+        }
+
+        .medication-content { 
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        .medication-name {
+            font-size: 24px;
+            font-weight: var(--base-font-weight);
+            margin-bottom: 8px;
+            color: var(--text-color-medication-name);
+            letter-spacing: -0.4px;
+            text-transform: uppercase;
+        }
+
+        .medication-status {
+            font-size: 12px;
+            color: var(--text-color-medication-status);
+            font-weight: var(--base-font-weight);
+        }
+        
+        .footer-actions {
+            display: flex; /* Changed to flex for row layout */
+            align-items: stretch; /* Make buttons same height */
+            border-top: 1px solid var(--border-color-light);
+        }
+
+        .more-options-wrapper {
+            position: relative; /* For positioning the menu */
+        }
+
+        .action-button { /* Base style for footer buttons */
+            background: none;
+            color: var(--accent-color);
+            border: none;
+            padding: 18px; /* Consistent padding */
+            font-size: 16px;
+            font-weight: var(--base-font-weight);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            letter-spacing: -0.2px;
+        }
+        .action-button:active {
+            background: #F8F8F8; 
+        }
+
+        .more-options-trigger {
+            border-right: 1px solid var(--border-color-light); /* Visual separator */
+            padding: 18px 20px; /* Adjust padding for icon */
+        }
+        .more-options-trigger svg {
+            display: block; /* Helps with alignment */
+        }
+
+        .add-medication-footer-btn {
+            flex-grow: 1; /* Takes remaining space */
+            gap: 8px;
+        }
+        
+        .options-menu {
+            position: absolute;
+            bottom: calc(100% + 5px); /* Position above the trigger button */
+            left: 0;
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 20; /* Ensure it's above other footer items */
+            display: none; /* Hidden by default */
+            width: max-content; /* Adjust width to content */
+            min-width: 180px; /* Minimum width */
+        }
+        .options-menu.active {
+            display: block;
+        }
+        .menu-button {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border-color-light);
+            color: var(--text-color-header);
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .menu-button:last-child {
+            border-bottom: none;
+        }
+        .menu-button:hover {
+            background-color: #f9f9f9;
+        }
+
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--modal-backdrop-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--primary-bg);
+            margin: 20px;
+            max-width: 400px;
+            width: calc(100% - 40px);
+            transform: scale(0.95);
+            transition: transform var(--transition-duration) ease;
+            border-radius: 8px; 
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-color-light);
+        }
+
+        .modal h2 {
+            font-size: 20px;
+            color: var(--text-color-header);
+            font-weight: var(--base-font-weight);
+            letter-spacing: -0.3px;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-light);
+            font-size: 14px;
+            letter-spacing: -0.1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 0;
+            border: none;
+            border-bottom: 1px solid var(--border-color-input);
+            font-size: 16px;
+            background: none;
+            transition: border-color 0.2s ease;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-header);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-bottom-color: var(--accent-color);
+        }
+
+        .modal-buttons {
+            display: flex;
+            border-top: 1px solid var(--border-color-light);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 18px; 
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: var(--base-font-weight);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            letter-spacing: -0.2px;
+        }
+
+        .modal-btn:first-child {
+            border-right: 1px solid var(--border-color-light);
+            color: var(--text-color-subheader);
+        }
+        .modal-btn:first-child:hover {
+            background: #f0f0f0;
+        }
+
+        .modal-btn:last-child {
+            color: var(--accent-color);
+            font-weight: 500; 
+        }
+        .modal-btn:last-child:hover {
+            background: #e8f0f2;
+        }
+
+        .records-header {
+            padding: 20px 20px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color-light);
+        }
+
+        .records-title {
+            font-size: 22px;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-header);
+            letter-spacing: -0.3px;
+            text-transform: uppercase;
+        }
+
+        .records-content {
+            flex: 1;
+            padding: 0 20px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            padding: 12px 0; 
+            font-size: 14px;
+            color: var(--text-color-light);
+            font-weight: var(--base-font-weight);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color-light);
+        }
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-item::before {
+            content: '•';
+            color: var(--accent-color);
+            font-size: 16px;
+            padding-left: 4px; 
+        }
+
+        .empty-records {
+            text-align: center;
+            color: #9A9A9A; 
+            font-size: 16px;
+            margin-top: 80px;
+            font-weight: var(--base-font-weight);
+            padding: 0 20px; 
+        }
+
+        .undo-redo-buttons {
+            display: flex;
+            border-top: 1px solid var(--border-color-light);
+        }
+
+        .undo-btn, .redo-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 20px;
+            font-size: 16px;
+            font-weight: var(--base-font-weight);
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            letter-spacing: -0.2px;
+        }
+        
+        .redo-btn {
+            border-right: 1px solid var(--border-color-light); 
+            color: var(--action-color-redo);
+        }
+        .redo-btn:hover:not(:disabled) {
+            background: #e8f0f2;
+        }
+
+        .undo-btn { 
+            color: var(--action-color-undo);
+        }
+        .undo-btn:hover:not(:disabled) {
+            background: #f5eaea;
+        }
+
+        .undo-btn:disabled, .redo-btn:disabled {
+            color: var(--disabled-color);
+            cursor: not-allowed;
+            background: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px; 
+            left: 50%;
+            transform: translateX(-50%) translateY(100px); 
+            background: var(--toast-bg);
+            color: white;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 300; 
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease, transform var(--transition-duration) var(--transition-timing-function);
+            backdrop-filter: blur(10px);
+            letter-spacing: -0.1px;
+            border-radius: 6px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0); 
+        }
+        
+        @media (max-width: 480px) {
+            .header { padding: 16px 16px 24px; }
+            .records-header { padding: 16px 16px 20px; }
+            .records-content { padding: 0 16px; }
+            .medications-list { padding-bottom: 16px; }
+            
+            .header h1 { font-size: 24px; }
+            .medication-content { padding: 20px 16px; } 
+            .modal-content { margin: 16px; width: calc(100% - 32px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="main-screen" id="mainScreen">
+            <div class="container">
+                <div class="header">
+                    <h1>MedTracker</h1>
+                </div>
+                <div class="medications-list" id="medicationsList">
+                </div>
+                <div class="footer-actions">
+                    <div class="more-options-wrapper">
+                        <button class="action-button more-options-trigger" id="moreOptionsTriggerBtn" aria-label="More options">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="12" cy="5" r="1"></circle>
+                                <circle cx="12" cy="19" r="1"></circle>
+                            </svg>
+                        </button>
+                        <div class="options-menu" id="optionsMenu">
+                            <button class="menu-button" id="exportDataMenuBtn">Export Data</button>
+                            <button class="menu-button" id="importDataMenuBtn">Import Data</button>
+                        </div>
+                    </div>
+                    <button class="action-button add-medication-footer-btn" id="addMedicationFooterBtn">
+                        + Add Medication
+                    </button>
+                </div>
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </div>
+        </div>
+
+        <div class="records-screen" id="recordsScreen">
+            <div class="records-container">
+                <div class="records-header">
+                    <h2 class="records-title" id="recordsTitle">Records</h2>
+                </div>
+                <div class="records-content" id="recordsContent">
+                </div>
+                <div class="undo-redo-buttons">
+                    <button class="redo-btn" id="redoBtn" onclick="tracker.redoLastRecord()">Redo</button>
+                    <button class="undo-btn" id="undoBtn" onclick="tracker.undoLastRecord()">Undo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Medication</h2>
+            </div>
+            <form id="addMedicationForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="medicationName">Medication Name</label>
+                        <input type="text" id="medicationName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="timeBetween">Hours Between Doses</label>
+                        <input type="number" id="timeBetween" min="1" max="48" value="4" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxDoses">Max Doses Per Day (Optional)</label>
+                        <input type="number" id="maxDoses" min="1" max="24">
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn" onclick="tracker.hideAddModal()">Cancel</button>
+                    <button type="submit" class="modal-btn">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        class MedicationTracker {
+            constructor() {
+                this.dom = {
+                    mainScreen: document.getElementById('mainScreen'),
+                    recordsScreen: document.getElementById('recordsScreen'),
+                    medicationsList: document.getElementById('medicationsList'),
+                    addModal: document.getElementById('addModal'),
+                    addMedicationForm: document.getElementById('addMedicationForm'),
+                    medicationNameInput: document.getElementById('medicationName'),
+                    timeBetweenInput: document.getElementById('timeBetween'),
+                    maxDosesInput: document.getElementById('maxDoses'),
+                    recordsTitle: document.getElementById('recordsTitle'),
+                    recordsContent: document.getElementById('recordsContent'),
+                    undoBtn: document.getElementById('undoBtn'),
+                    redoBtn: document.getElementById('redoBtn'),
+                    toast: document.getElementById('toast'),
+                    // New DOM elements for footer actions
+                    addMedicationFooterBtn: document.getElementById('addMedicationFooterBtn'),
+                    moreOptionsTriggerBtn: document.getElementById('moreOptionsTriggerBtn'),
+                    optionsMenu: document.getElementById('optionsMenu'),
+                    exportDataMenuBtn: document.getElementById('exportDataMenuBtn'),
+                    importDataMenuBtn: document.getElementById('importDataMenuBtn'),
+                    importFileInput: document.getElementById('importFile')
+                };
+
+                this.medications = JSON.parse(localStorage.getItem('medications') || '[]');
+                this.currentRecordsMedication = null;
+                this.undoStack = [];
+                this.unifiedSwipeListenerCleanup = null;
+                this.isScreenTransitioning = false;
+                this.activeItemGestures = new Set();
+                this.toastTimeout = null;
+
+                this.init();
+            }
+
+            init() {
+                this.renderMedications();
+                this.startTimeUpdater();
+                this.setupEventListeners();
+            }
+
+            startTimeUpdater() {
+                setInterval(() => {
+                    if (this.activeItemGestures.size === 0 && !this.isScreenTransitioning) {
+                        this.renderMedications();
+                    }
+                }, 1000);
+            }
+
+            setupEventListeners() {
+                this.dom.addMedicationForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addMedication();
+                });
+                this.dom.addModal.addEventListener('click', (e) => {
+                    if (e.target === this.dom.addModal) this.hideAddModal();
+                });
+
+                // Footer action buttons
+                this.dom.addMedicationFooterBtn.addEventListener('click', () => this.showAddModal());
+                this.dom.moreOptionsTriggerBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent click from closing menu immediately if we add a document click listener
+                    this.toggleOptionsMenu();
+                });
+                this.dom.exportDataMenuBtn.addEventListener('click', () => {
+                    this.exportData();
+                    this.toggleOptionsMenu(false); // Close menu after action
+                });
+                this.dom.importDataMenuBtn.addEventListener('click', () => {
+                    this.dom.importFileInput.click();
+                    this.toggleOptionsMenu(false); // Close menu
+                });
+                
+                this.dom.importFileInput.addEventListener('change', (event) => this.importData(event));
+
+                // Optional: Close menu when clicking outside
+                document.addEventListener('click', (event) => {
+                    if (this.dom.optionsMenu.classList.contains('active') && 
+                        !this.dom.optionsMenu.contains(event.target) && 
+                        event.target !== this.dom.moreOptionsTriggerBtn &&
+                        !this.dom.moreOptionsTriggerBtn.contains(event.target) // Check if click was on SVG inside button
+                        ) {
+                        this.toggleOptionsMenu(false);
+                    }
+                });
+            }
+            
+            toggleOptionsMenu(forceState) {
+                if (typeof forceState === 'boolean') {
+                    this.dom.optionsMenu.classList.toggle('active', forceState);
+                } else {
+                    this.dom.optionsMenu.classList.toggle('active');
+                }
+            }
+
+
+            exportData() {
+                if (this.medications.length === 0) {
+                    this.showToast('No data to export.');
+                    return;
+                }
+                const jsonData = JSON.stringify(this.medications, null, 2); 
+                const blob = new Blob([jsonData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `medication_tracker_backup_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                this.showToast('Data exported successfully.');
+            }
+
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) {
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedMedications = JSON.parse(e.target.result);
+                        if (!Array.isArray(importedMedications)) {
+                            throw new Error('Invalid file format: Not an array.');
+                        }
+                        this.medications = importedMedications;
+                        this.saveAndRender();
+                        this.showToast(`Data imported successfully. ${this.medications.length} medication(s) loaded.`);
+                    } catch (error) {
+                        console.error('Error importing data:', error);
+                        this.showToast(`Error importing data: ${error.message}`);
+                    } finally {
+                        event.target.value = null; 
+                    }
+                };
+                reader.onerror = () => {
+                    this.showToast('Error reading file.');
+                    event.target.value = null;
+                };
+                reader.readAsText(file);
+            }
+
+
+            addMedication() {
+                const name = this.dom.medicationNameInput.value.trim();
+                const timeBetween = parseInt(this.dom.timeBetweenInput.value);
+                const maxDoses = parseInt(this.dom.maxDosesInput.value) || 0;
+
+                if (!name || !timeBetween) {
+                    this.showToast('Please fill in required fields.');
+                    return;
+                }
+                const medication = { id: Date.now().toString(), name, timeBetweenHours: timeBetween, maxDosesPerDay: maxDoses, records: [] };
+                this.medications.push(medication);
+                this.saveAndRender();
+                this.hideAddModal();
+                this.showToast(`${name} added successfully.`);
+            }
+
+            consumeMedication(id) {
+                const medication = this.medications.find(m => m.id === id);
+                if (!medication) return;
+                medication.records.push(Date.now());
+                this.saveAndRender();
+                this.showToast(`${medication.name} logged.`);
+            }
+
+            showRecords(id) {
+                if (this.isScreenTransitioning) return;
+                const medication = this.medications.find(m => m.id === id);
+                if (!medication) return;
+
+                this.isScreenTransitioning = true;
+                this.currentRecordsMedication = medication;
+                this.undoStack = [];
+                
+                this.dom.recordsTitle.textContent = medication.name;
+                this.updateRecordsDisplay();
+                this.updateUndoRedoButtons();
+                
+                this.dom.mainScreen.style.transform = '';
+                this.dom.recordsScreen.style.transform = '';
+
+                this.dom.recordsScreen.classList.add('active');
+                this.dom.mainScreen.classList.add('viewing-records');
+
+                const onTransitionEnd = () => {
+                    this.dom.recordsScreen.removeEventListener('transitionend', onTransitionEnd);
+                    this.isScreenTransitioning = false;
+                    this.setupUnifiedSwipeToHideRecords();
+                };
+                this.dom.recordsScreen.addEventListener('transitionend', onTransitionEnd, { once: true });
+            }
+
+            hideRecords() {
+                if (this.isScreenTransitioning) return;
+                
+                this.isScreenTransitioning = true;
+                this.removeUnifiedSwipeToHideRecords();
+                
+                this.dom.mainScreen.style.transform = '';
+                this.dom.recordsScreen.style.transform = '';
+
+                this.dom.recordsScreen.classList.remove('active');
+                this.dom.mainScreen.classList.remove('viewing-records');
+
+                const onTransitionEnd = () => {
+                    this.dom.recordsScreen.removeEventListener('transitionend', onTransitionEnd);
+                    this.currentRecordsMedication = null;
+                    this.isScreenTransitioning = false;
+                    this.renderMedications(); 
+                };
+                this.dom.recordsScreen.addEventListener('transitionend', onTransitionEnd, { once: true });
+            }
+
+            undoLastRecord() {
+                if (!this.currentRecordsMedication || this.currentRecordsMedication.records.length === 0) {
+                    this.showToast(this.currentRecordsMedication ? 'No records to undo.' : 'No medication selected.');
+                    return;
+                }
+                const removedRecord = this.currentRecordsMedication.records.pop();
+                this.undoStack.push(removedRecord);
+                this.saveAndRender();
+                this.updateRecordsDisplay();
+                this.updateUndoRedoButtons();
+                this.showToast('Record removed.');
+            }
+
+            redoLastRecord() {
+                if (!this.currentRecordsMedication || this.undoStack.length === 0) {
+                    this.showToast(this.currentRecordsMedication ? 'Nothing to redo.' : 'No medication selected.');
+                    return;
+                }
+                const recordToRestore = this.undoStack.pop();
+                this.currentRecordsMedication.records.push(recordToRestore);
+                this.saveAndRender();
+                this.updateRecordsDisplay();
+                this.updateUndoRedoButtons();
+                this.showToast('Record restored.');
+            }
+
+            updateRecordsDisplay() {
+                if (!this.currentRecordsMedication) {
+                    this.dom.recordsContent.innerHTML = '<div class="empty-records">No medication selected.</div>';
+                    return;
+                }
+                const records = this.currentRecordsMedication.records;
+                if (records.length === 0) {
+                    this.dom.recordsContent.innerHTML = '<div class="empty-records">No records yet.</div>';
+                } else {
+                    const sortedRecords = [...records].sort((a, b) => a - b); // Oldest first
+                    this.dom.recordsContent.innerHTML = sortedRecords.map(timestamp => 
+                        `<div class="record-item">${this.formatDateTime(timestamp)}</div>`
+                    ).join('');
+                }
+            }
+
+            updateUndoRedoButtons() {
+                const hasRecords = this.currentRecordsMedication && this.currentRecordsMedication.records.length > 0;
+                const hasUndoStack = this.undoStack && this.undoStack.length > 0;
+                this.dom.undoBtn.disabled = !hasRecords;
+                this.dom.redoBtn.disabled = !hasUndoStack;
+            }
+            
+            setupUnifiedSwipeToHideRecords() {
+                this.removeUnifiedSwipeToHideRecords(); 
+                let startX = 0, currentX = 0, isDragging = false;
+                const screenWidth = window.innerWidth;
+
+                const onStart = (e) => {
+                    if (this.isScreenTransitioning) return;
+                    const touch = e.touches ? e.touches[0] : e;
+                    startX = touch.clientX; currentX = 0; isDragging = false;
+                    this.dom.recordsScreen.style.transition = 'none';
+                    this.dom.mainScreen.style.transition = 'none';
+                };
+
+                const onMove = (e) => {
+                    if (this.isScreenTransitioning || !e.touches) return; 
+                    const touch = e.touches[0];
+                    const deltaX = touch.clientX - startX;
+                    if (deltaX <= 0) return; 
+
+                    e.preventDefault(); 
+                    currentX = deltaX;
+                    isDragging = deltaX > 10; 
+                    if (isDragging) {
+                        this.dom.recordsScreen.style.transform = `translateX(${currentX}px)`;
+                        this.dom.mainScreen.style.transform = `translateX(${-screenWidth + currentX}px)`;
+                    }
+                };
+
+                const onEnd = () => {
+                    if (this.isScreenTransitioning && !isDragging) return;
+                    this.dom.recordsScreen.style.transition = ''; 
+                    this.dom.mainScreen.style.transition = '';
+                    const threshold = screenWidth * 0.3;
+                    if (currentX > threshold && isDragging) {
+                        this.dom.mainScreen.style.transform = ''; 
+                        this.dom.recordsScreen.style.transform = ''; 
+                        this.hideRecords();
+                    } else {
+                        this.dom.recordsScreen.style.transform = 'translateX(0)';
+                        this.dom.mainScreen.style.transform = `translateX(-${screenWidth}px)`;
+                    }
+                    isDragging = false;
+                };
+                
+                const passiveFalse = { passive: false };
+                this.dom.recordsScreen.addEventListener('touchstart', onStart, passiveFalse);
+                this.dom.recordsScreen.addEventListener('touchmove', onMove, passiveFalse);
+                this.dom.recordsScreen.addEventListener('touchend', onEnd);
+                this.dom.recordsScreen.addEventListener('touchcancel', onEnd);
+
+                this.unifiedSwipeListenerCleanup = () => {
+                    this.dom.recordsScreen.removeEventListener('touchstart', onStart, passiveFalse);
+                    this.dom.recordsScreen.removeEventListener('touchmove', onMove, passiveFalse);
+                    this.dom.recordsScreen.removeEventListener('touchend', onEnd);
+                    this.dom.recordsScreen.removeEventListener('touchcancel', onEnd);
+                };
+            }
+
+            removeUnifiedSwipeToHideRecords() {
+                if (this.unifiedSwipeListenerCleanup) {
+                    this.unifiedSwipeListenerCleanup();
+                    this.unifiedSwipeListenerCleanup = null;
+                }
+            }
+
+            getTimeSinceLastDose(med) { return med.records.length === 0 ? Infinity : Date.now() - Math.max(...med.records); }
+            getTimeUntilNextDose(med) { const ts = this.getTimeSinceLastDose(med); return Math.max(0, med.timeBetweenHours * 3600000 - ts); }
+            isSafeToConsume(med) { return this.getTimeUntilNextDose(med) === 0; }
+            getProgressRatio(med) { const ts = this.getTimeSinceLastDose(med); return ts === Infinity ? 0 : Math.min(1, ts / (med.timeBetweenHours * 3600000)); }
+
+            getCardColor(medication) {
+                if (this.isSafeToConsume(medication)) {
+                    return `linear-gradient(135deg, var(--safe-gradient-start) 0%, var(--safe-gradient-end) 100%)`;
+                }
+                const progress = this.getProgressRatio(medication);
+                const rO = 230, gO = 81, bO = 0;   // Orange
+                const rG = 46, gG = 125, bG = 50;  // Green
+                const r = Math.round(rO + (rG - rO) * progress);
+                const g = Math.round(gO + (gG - gO) * progress);
+                const b = Math.round(bO + (bG - bO) * progress);
+                return `rgb(${r}, ${g}, ${b})`; 
+            }
+
+            formatDuration(ms) {
+                if (ms === Infinity) return 'N/A';
+                const s = Math.floor(ms / 1000);
+                const h = Math.floor(s / 3600);
+                const m = Math.floor((s % 3600) / 60);
+                if (h > 0) return `${h}h ${m}m`;
+                if (m > 0) return `${m}m ${s % 60}s`;
+                return `${s % 60}s`;
+            }
+
+            formatDateTime(ts) { return new Date(ts).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }); }
+
+            setupItemSwipeGestures(element, medication) {
+                if (element.hasSwipeGesturesAttached) return;
+                element.hasSwipeGesturesAttached = true;
+                
+                const medicationContentWrapper = element.querySelector('.medication-content-wrapper');
+                if (!medicationContentWrapper) return; 
+
+                let startX = 0, currentX = 0, startY = 0;
+                let isItemDragMode = false;  
+                let isScreenSlideMode = false; 
+                const gestureId = Math.random();
+                const screenWidth = window.innerWidth;
+                const itemActionThreshold = 80; 
+                const screenSlideInitiationThreshold = 15; 
+
+                const onStart = (e) => {
+                    if (this.isScreenTransitioning || (this.activeItemGestures.size > 0 && !this.activeItemGestures.has(gestureId))) return;
+                    this.activeItemGestures.add(gestureId);
+                    const touch = e.touches ? e.touches[0] : e;
+                    startX = touch.clientX; startY = touch.clientY;
+                    currentX = 0; isItemDragMode = false; isScreenSlideMode = false;
+                    
+                    this.dom.mainScreen.style.transition = 'none';
+                    this.dom.recordsScreen.style.transition = 'none';
+                    medicationContentWrapper.style.transition = 'none'; 
+                    element.classList.remove('swiping-right'); 
+                };
+
+                const onMove = (e) => {
+                    if (!this.activeItemGestures.has(gestureId) || this.isScreenTransitioning) return;
+
+                    const touch = e.touches ? e.touches[0] : e;
+                    const deltaX = touch.clientX - startX;
+                    const deltaY = Math.abs(touch.clientY - startY);
+                    currentX = deltaX;
+
+                    if (isScreenSlideMode) {
+                        e.preventDefault();
+                        const mainScreenX = Math.max(-screenWidth, deltaX);
+                        const recordsScreenX = screenWidth + mainScreenX; 
+                        this.dom.mainScreen.style.transform = `translateX(${mainScreenX}px)`;
+                        this.dom.recordsScreen.style.transform = `translateX(${recordsScreenX}px)`;
+                        return;
+                    }
+
+                    if (isItemDragMode) { 
+                         e.preventDefault();
+                         medicationContentWrapper.style.transform = `translateX(${Math.max(0, deltaX)}px)`;
+                         element.classList.add('swiping-right'); 
+                         return;
+                    }
+                    
+                    if (deltaX < -screenSlideInitiationThreshold && Math.abs(deltaX) > deltaY * 1.2) { 
+                        e.preventDefault();
+                        isScreenSlideMode = true;
+                        isItemDragMode = false; 
+                        medicationContentWrapper.style.transform = ''; 
+                        element.classList.remove('swiping-right');
+
+                        this.currentRecordsMedication = medication;
+                        this.dom.recordsTitle.textContent = medication.name;
+                        this.undoStack = [];
+                        this.updateRecordsDisplay();
+                        this.updateUndoRedoButtons();
+
+                        const initialMainScreenX = Math.max(-screenWidth, deltaX);
+                        const initialRecordsScreenX = screenWidth + initialMainScreenX;
+                        this.dom.mainScreen.style.transform = `translateX(${initialMainScreenX}px)`;
+                        this.dom.recordsScreen.style.transform = `translateX(${initialRecordsScreenX}px)`;
+
+                    } else if (deltaX > 10 && Math.abs(deltaX) > deltaY * 1.2) { 
+                        e.preventDefault();
+                        isItemDragMode = true;
+                        isScreenSlideMode = false; 
+                        medicationContentWrapper.style.transform = `translateX(${deltaX}px)`;
+                        element.classList.add('swiping-right');
+                    }
+                };
+
+                const onEnd = () => {
+                    if (!this.activeItemGestures.has(gestureId)) return;
+                    this.activeItemGestures.delete(gestureId);
+
+                    this.dom.mainScreen.style.transition = ''; 
+                    this.dom.recordsScreen.style.transition = '';
+                    medicationContentWrapper.style.transition = ''; 
+                    element.classList.remove('swiping-right');
+
+
+                    if (isScreenSlideMode) { 
+                        const slideCompleteThreshold = screenWidth * 0.35; 
+                        if (currentX < -slideCompleteThreshold) { 
+                            this.showRecords(medication.id);
+                        } else { 
+                            this.isScreenTransitioning = true; 
+                            this.dom.mainScreen.style.transition = 'transform var(--transition-duration) var(--transition-timing-function)';
+                            this.dom.recordsScreen.style.transition = 'transform var(--transition-duration) var(--transition-timing-function)';
+                            
+                            this.dom.mainScreen.style.transform = 'translateX(0px)';
+                            this.dom.recordsScreen.style.transform = 'translateX(100%)';
+
+                            const onSnapBackEnd = () => {
+                                this.dom.recordsScreen.removeEventListener('transitionend', onSnapBackEnd);
+                                this.dom.mainScreen.style.transition = ''; 
+                                this.dom.recordsScreen.style.transition = '';
+                                this.isScreenTransitioning = false;
+                            };
+                            this.dom.recordsScreen.addEventListener('transitionend', onSnapBackEnd, { once: true });
+                        }
+                    } else if (isItemDragMode) { 
+                        medicationContentWrapper.style.transform = ''; 
+                        if (currentX > itemActionThreshold) { 
+                            setTimeout(() => this.consumeMedication(medication.id), 0); 
+                        }
+                    } else {
+                        medicationContentWrapper.style.transform = ''; 
+                    }
+                    
+                    isItemDragMode = false; 
+                    isScreenSlideMode = false;
+                };
+                
+                const passiveFalse = { passive: false };
+                element.addEventListener('touchstart', onStart, passiveFalse);
+                element.addEventListener('touchmove', onMove, passiveFalse);
+                element.addEventListener('touchend', onEnd);
+                element.addEventListener('touchcancel', onEnd);
+            }
+
+            renderMedications() {
+                if (this.activeItemGestures.size > 0 || this.isScreenTransitioning) return;
+                const container = this.dom.medicationsList;
+                if (this.medications.length === 0) {
+                    container.innerHTML = `<div class="empty-records"><p>No medications added yet.</p><p style="font-size: 14px; margin-top: 8px;">Tap an action below to start.</p></div>`;
+                    return;
+                }
+                container.innerHTML = this.medications.map(med => {
+                    const statusText = this.isSafeToConsume(med) ? 'Safe to take now' : `Next dose in: ${this.formatDuration(this.getTimeUntilNextDose(med))}`;
+                    return `
+                        <div class="medication-item" data-id="${med.id}" style="background: ${this.getCardColor(med)};">
+                            <div class="medication-swipe-actions">
+                                <div class="swipe-action-text">Log Dose</div>
+                            </div>
+                            <div class="medication-content-wrapper">
+                                <div class="medication-content">
+                                    <div class="medication-name">${med.name}</div>
+                                    <div class="medication-status">${statusText}</div>
+                                </div>
+                            </div>
+                        </div>`;
+                }).join('');
+                container.querySelectorAll('.medication-item').forEach(item => {
+                    const med = this.medications.find(m => m.id === item.dataset.id);
+                    if (med) this.setupItemSwipeGestures(item, med);
+                });
+            }
+            
+            saveAndRender() {
+                this.saveMedications();
+                this.renderMedications();
+                if (this.currentRecordsMedication && this.dom.recordsScreen.classList.contains('active')) {
+                    this.updateRecordsDisplay();
+                    this.updateUndoRedoButtons();
+                }
+            }
+
+            showAddModal() { this.dom.addModal.classList.add('active'); setTimeout(() => this.dom.medicationNameInput.focus(), 300); }
+            hideAddModal() { this.dom.addModal.classList.remove('active'); this.dom.addMedicationForm.reset(); }
+
+            showToast(message) {
+                if (this.toastTimeout) clearTimeout(this.toastTimeout);
+                this.dom.toast.textContent = message;
+                this.dom.toast.classList.add('active');
+                this.toastTimeout = setTimeout(() => this.dom.toast.classList.remove('active'), 2800);
+            }
+            saveMedications() { localStorage.setItem('medications', JSON.stringify(this.medications)); }
+        }
+
+        const tracker = new MedicationTracker();
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) event.preventDefault();
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
+                self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                self.addEventListener('fetch', (e) => {
+                    e.respondWith(
+                        fetch(e.request).catch(() => {
+                            console.log('Network request failed for:', e.request.url);
+                        })
+                    );
+                }); 
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob))
+                .then(reg => console.log('Service Worker registered.', reg))
+                .catch(err => console.warn('Service Worker registration failed:', err));
+        }
+    </script>
+</body>
+</html>
