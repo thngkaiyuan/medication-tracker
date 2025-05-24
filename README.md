@@ -1,5 +1,7 @@
 # Medication Tracker PWA
 
+<img width="703" alt="image" src="https://github.com/user-attachments/assets/e5e6705d-df6d-4c0d-9b2f-96ece9506c0b" />
+
 A simple, clean, and modern Progressive Web App (PWA) to help you track your medication intake, view your history, and manage your medication schedule effectively. All data is stored locally in your browser.
 
 **Access the App:** <https://thngkaiyuan.github.io/medication-tracker/>
