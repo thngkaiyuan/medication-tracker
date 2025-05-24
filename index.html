@@ -21,7 +21,7 @@
             --accent-color: #92A3A7;
             --action-color-undo: #C49999; 
             --action-color-redo: #92A3A7; 
-            --action-color-delete: #D32F2F; /* Red for delete actions */
+            --action-color-delete: #D32F2F; 
             --disabled-color: #CCCCCC;
             --modal-backdrop-color: rgba(0, 0, 0, 0.4);
             --toast-bg: rgba(74, 74, 74, 0.9);
@@ -262,7 +262,6 @@
             background-color: #f9f9f9;
         }
 
-        /* Styles for all modals */
         .modal {
             position: fixed;
             top: 0;
@@ -308,19 +307,19 @@
             align-items: center;
         }
         
-        .modal-header h2 { /* Generic title styling */
+        .modal-header h2 { 
             font-size: 20px;
             color: var(--text-color-header);
             font-weight: var(--base-font-weight);
             letter-spacing: -0.3px;
-            flex-grow: 1; /* Allow title to take space */
-            text-align: center; /* Center title */
+            flex-grow: 1; 
+            text-align: center; 
         }
-        /* If there's an icon on one side, ensure title remains centered */
         .modal-header .delete-med-icon-btn { 
-            flex-shrink: 0; /* Don't let icon shrink */
+            flex-shrink: 0; 
         }
-        .modal-header h2:only-child { /* If title is only child, ensure it's fully centered */
+        #actionChoiceModal .modal-header h2, /* Specifically target action choice title */
+        .modal-header h2:only-child { 
             margin-left: auto;
             margin-right: auto;
         }
@@ -367,9 +366,7 @@
             font-weight: 500;
         }
 
-        /* Medication Add/Edit Modal Specifics */
         #modalTitle { 
-             /* Inherits from .modal-header h2 */
         }
 
         .delete-med-icon-btn {
@@ -424,19 +421,13 @@
             display: none; 
         }
 
-        /* Action Choice Modal Specifics */
-        #actionChoiceModal .modal-body { /* Remove modal body for action choice */
-            display: none;
-        }
-        #actionChoiceModalTitle { 
-             text-align: center; 
-             width: 100%; 
-             padding: 20px 24px 0; /* Add padding if modal-body is removed */
+        #actionChoiceModal .modal-body { 
+            display: none; 
         }
         #actionChoiceModal .modal-header { 
             justify-content: center;
-            border-bottom: none; /* No border if no body */
-            padding-bottom: 20px; /* Space before buttons */
+            border-bottom: none; 
+            padding-bottom: 20px; 
         }
         #actionChoiceModal .modal-buttons {
             border-top: 1px solid var(--border-color-light); 
@@ -855,6 +846,7 @@
                 this.dom.modalCancelBtn.textContent = 'Cancel';
                 
                 this.dom.medicationModal.classList.add('active');
+                // Delay focus slightly to allow modal transition and prevent issues
                 setTimeout(() => this.dom.modalMedicationName.focus(), 50); 
             }
 
@@ -1033,6 +1025,22 @@
             showRecords(id) {
                 if (this.isScreenTransitioning) return;
                 const medication = this.medications.find(m => m.id === id);
+                
+                // PWA DEBUGGING FOR IMPORT
+                console.log("PWA DEBUG: Showing records for ID:", id);
+                if (medication) {
+                    console.log("PWA DEBUG: Found medication object:", JSON.parse(JSON.stringify(medication))); // Deep copy for logging
+                    if (medication.records && Array.isArray(medication.records)) {
+                        console.log("PWA DEBUG: Number of records found in object:", medication.records.length);
+                        console.log("PWA DEBUG: First 5 records:", medication.records.slice(0,5));
+                    } else {
+                        console.warn("PWA DEBUG: Medication found, but 'records' property is missing, not an array, or empty:", medication.records);
+                    }
+                } else {
+                    console.warn("PWA DEBUG: Medication with ID not found in this.medications array:", id);
+                }
+                // END PWA DEBUGGING
+
                 if (!medication) {
                     this.hideRecords(); 
                     return;
@@ -1119,7 +1127,15 @@
                     return;
                 }
                 const records = this.currentRecordsMedication.records;
-                if (records.length === 0) {
+                 // PWA DEBUGGING for updateRecordsDisplay
+                if (records && Array.isArray(records)) {
+                    console.log("PWA DEBUG (updateRecordsDisplay): Records length:", records.length);
+                } else {
+                    console.warn("PWA DEBUG (updateRecordsDisplay): this.currentRecordsMedication.records is not an array or is undefined", records);
+                }
+                // END PWA DEBUGGING
+
+                if (!records || records.length === 0) { // Added !records check
                     this.dom.recordsContent.innerHTML = '<div class="empty-records">No records yet.</div>';
                 } else {
                     const sortedRecords = [...records].sort((a, b) => a - b); 
@@ -1130,7 +1146,7 @@
             }
 
             updateUndoRedoButtons() {
-                const hasRecords = this.currentRecordsMedication && this.currentRecordsMedication.records.length > 0;
+                const hasRecords = this.currentRecordsMedication && this.currentRecordsMedication.records && this.currentRecordsMedication.records.length > 0;
                 const hasUndoStack = this.undoStack && this.undoStack.length > 0;
                 this.dom.undoBtn.disabled = !hasRecords;
                 this.dom.redoBtn.disabled = !hasUndoStack;
@@ -1229,7 +1245,14 @@
                 return `${s % 60}s`;
             }
 
-            formatDateTime(ts) { return new Date(ts).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }); }
+            formatDateTime(ts) { 
+                const date = new Date(ts);
+                // Added year: 'numeric'
+                return date.toLocaleDateString(undefined, { 
+                    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+                    hour: 'numeric', minute: '2-digit', hour12: true 
+                });
+            }
 
             setupItemSwipeGestures(element, medication) {
                 if (element.hasSwipeGesturesAttached) return;
