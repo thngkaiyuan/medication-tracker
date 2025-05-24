@@ -19,8 +19,8 @@
             --border-color-light: #EEEEEE;
             --border-color-input: #E0E0E0;
             --accent-color: #92A3A7;
-            --action-color-undo: #C49999; 
-            --action-color-redo: #92A3A7; 
+            --action-color-undo: #D32F2F; /* Stronger Red */
+            --action-color-redo: #2196F3; /* Clearer Blue */
             --action-color-delete: #D32F2F; 
             --disabled-color: #CCCCCC;
             --modal-backdrop-color: rgba(0, 0, 0, 0.4);
@@ -184,6 +184,12 @@
             color: var(--text-color-medication-status);
             font-weight: var(--base-font-weight);
         }
+        .medication-last-consumed {
+            font-size: 10px; /* Smaller font for last consumed */
+            color: rgba(255, 255, 255, 0.75); /* Slightly more transparent */
+            font-weight: var(--base-font-weight);
+            margin-top: 6px;
+        }
         
         .footer-actions {
             display: flex; 
@@ -318,7 +324,7 @@
         .modal-header .delete-med-icon-btn { 
             flex-shrink: 0; 
         }
-        #actionChoiceModal .modal-header h2, /* Specifically target action choice title */
+        #actionChoiceModal .modal-header h2, 
         .modal-header h2:only-child { 
             margin-left: auto;
             margin-right: auto;
@@ -526,17 +532,17 @@
         
         .redo-btn {
             border-right: 1px solid var(--border-color-light); 
-            color: var(--action-color-redo);
+            color: var(--action-color-redo); /* New color */
         }
         .redo-btn:hover:not(:disabled) {
-            background: #e8f0f2;
+            background: #e3f2fd; /* Lighter blue hover */
         }
 
         .undo-btn { 
-            color: var(--action-color-undo);
+            color: var(--action-color-undo); /* New color */
         }
         .undo-btn:hover:not(:disabled) {
-            background: #f5eaea;
+            background: #ffebee; /* Lighter red hover */
         }
 
         .undo-btn:disabled, .redo-btn:disabled {
@@ -846,7 +852,6 @@
                 this.dom.modalCancelBtn.textContent = 'Cancel';
                 
                 this.dom.medicationModal.classList.add('active');
-                // Delay focus slightly to allow modal transition and prevent issues
                 setTimeout(() => this.dom.modalMedicationName.focus(), 50); 
             }
 
@@ -1025,22 +1030,6 @@
             showRecords(id) {
                 if (this.isScreenTransitioning) return;
                 const medication = this.medications.find(m => m.id === id);
-                
-                // PWA DEBUGGING FOR IMPORT
-                console.log("PWA DEBUG: Showing records for ID:", id);
-                if (medication) {
-                    console.log("PWA DEBUG: Found medication object:", JSON.parse(JSON.stringify(medication))); // Deep copy for logging
-                    if (medication.records && Array.isArray(medication.records)) {
-                        console.log("PWA DEBUG: Number of records found in object:", medication.records.length);
-                        console.log("PWA DEBUG: First 5 records:", medication.records.slice(0,5));
-                    } else {
-                        console.warn("PWA DEBUG: Medication found, but 'records' property is missing, not an array, or empty:", medication.records);
-                    }
-                } else {
-                    console.warn("PWA DEBUG: Medication with ID not found in this.medications array:", id);
-                }
-                // END PWA DEBUGGING
-
                 if (!medication) {
                     this.hideRecords(); 
                     return;
@@ -1051,7 +1040,7 @@
                 this.undoStack = [];
                 
                 this.dom.recordsTitle.textContent = medication.name;
-                this.updateRecordsDisplay();
+                this.updateRecordsDisplay(); // This will also call auto-scroll
                 this.updateUndoRedoButtons();
                 
                 this.dom.mainScreen.style.transform = '';
@@ -1127,21 +1116,15 @@
                     return;
                 }
                 const records = this.currentRecordsMedication.records;
-                 // PWA DEBUGGING for updateRecordsDisplay
-                if (records && Array.isArray(records)) {
-                    console.log("PWA DEBUG (updateRecordsDisplay): Records length:", records.length);
-                } else {
-                    console.warn("PWA DEBUG (updateRecordsDisplay): this.currentRecordsMedication.records is not an array or is undefined", records);
-                }
-                // END PWA DEBUGGING
-
-                if (!records || records.length === 0) { // Added !records check
+                if (!records || records.length === 0) { 
                     this.dom.recordsContent.innerHTML = '<div class="empty-records">No records yet.</div>';
                 } else {
                     const sortedRecords = [...records].sort((a, b) => a - b); 
                     this.dom.recordsContent.innerHTML = sortedRecords.map(timestamp => 
                         `<div class="record-item">${this.formatDateTime(timestamp)}</div>`
                     ).join('');
+                    // Auto-scroll to the bottom (newest record)
+                    this.dom.recordsContent.scrollTop = this.dom.recordsContent.scrollHeight;
                 }
             }
 
@@ -1247,7 +1230,6 @@
 
             formatDateTime(ts) { 
                 const date = new Date(ts);
-                // Added year: 'numeric'
                 return date.toLocaleDateString(undefined, { 
                     weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
                     hour: 'numeric', minute: '2-digit', hour12: true 
@@ -1407,6 +1389,11 @@
                 }
                 container.innerHTML = this.medications.map(med => {
                     const statusText = this.isSafeToConsume(med) ? 'Safe to take now' : `Next dose in: ${this.formatDuration(this.getTimeUntilNextDose(med))}`;
+                    let lastConsumedText = 'Last: Never';
+                    if (med.records && med.records.length > 0) {
+                        const lastRecordTimestamp = Math.max(...med.records);
+                        lastConsumedText = `Last: ${this.formatDateTime(lastRecordTimestamp)}`;
+                    }
                     return `
                         <div class="medication-item" data-id="${med.id}" style="background: ${this.getCardColor(med)};">
                             <div class="medication-swipe-actions">
@@ -1416,6 +1403,7 @@
                                 <div class="medication-content">
                                     <div class="medication-name">${med.name}</div>
                                     <div class="medication-status">${statusText}</div>
+                                    <div class="medication-last-consumed">${lastConsumedText}</div>
                                 </div>
                             </div>
                         </div>`;
