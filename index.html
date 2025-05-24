@@ -6,7 +6,18 @@
     <title>Medication Tracker</title>
     <meta name="description" content="A simple app to track your medication intake and history.">
     <meta name="theme-color" content="#92A3A7">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Medication%20Tracker%22%2C%22short_name%22%3A%22MedTracker%22%2C%22description%22%3A%22A%20simple%20app%20to%20track%20your%20medication%20intake%20and%20history.%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23FFFFFF%22%2C%22theme_color%22%3A%22%2392A3A7%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage/svg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%3D%27http%3A//www.w3.org/2000/svg%27%2520width%3D%27192%27%2520height%3D%27192%27%2520viewBox%3D%270%25200%2520192%2520192%27%253E%253Crect%2520width%3D%27192%27%2520height%3D%27192%27%2520fill%3D%27%2523FFFFFF%27/%253E%253Cpath%2520d%3D%27M86%252032h20v54h54v20h-54v54h-20v-54h-54v-20h54z%27%2520fill%3D%27%252392A3A7%27/%253E%253C/svg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/svg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22data%3Aimage/svg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%3D%27http%3A//www.w3.org/2000/svg%27%2520width%3D%27512%27%2520height%3D%27512%27%2520viewBox%3D%270%25200%2520512%2520512%27%253E%253Crect%2520width%3D%27512%27%2520height%3D%27512%27%2520fill%3D%27%2523FFFFFF%27/%253E%253Cpath%2520d%3D%27M224%252096h64v128h128v64h-128v128h-64v-128h-128v-64h128z%27%2520fill%3D%27%252392A3A7%27/%253E%253C/svg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/svg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%5D%7D">
+    <!-- 
+      Manifest Data URL:
+      - name: "Medication Tracker"
+      - short_name: "MedTracker"
+      - description: "A simple app to track your medication intake and history."
+      - start_url: "." (relative to the document)
+      - display: "standalone"
+      - background_color: "#FFFFFF"
+      - theme_color: "#92A3A7"
+      - icons: Two SVG icons (192x192, 512x512) with purpose "any maskable"
+    -->
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Medication%20Tracker%22%2C%22short_name%22%3A%22MedTracker%22%2C%22description%22%3A%22A%20simple%20app%20to%20track%20your%20medication%20intake%20and%20history.%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23FFFFFF%22%2C%22theme_color%22%3A%22%2392A3A7%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage/svg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%3D%27http%3A//www.w3.org/2000/svg%27%2520width%3D%27192%27%2520height%3D%27192%27%2520viewBox%3D%270%25200%2520192%2520192%27%253E%253Crect%2520width%3D%27192%27%2520height%3D%27192%27%2520fill%3D%27%2523FFFFFF%27/%253E%253Cpath%2520d%3D%27M86%252032h20v54h54v20h-54v54h-20v-54h-54v-20h54z%27%2520fill%3D%27%252392A3A7%27/%253E%253C/svg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/svg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage/svg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%3D%27http%3A//www.w3.org/2000/svg%27%2520width%3D%27512%27%2520height%3D%27512%27%2520viewBox%3D%270%25200%2520512%2520512%27%253E%253Crect%2520width%3D%27512%27%2520height%3D%27512%27%2520fill%3D%27%2523FFFFFF%27/%253E%253Cpath%2520d%3D%27M224%252096h64v128h128v64h-128v128h-64v-128h-128v-64h128z%27%2520fill%3D%27%252392A3A7%27/%253E%253C/svg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/svg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
     <style>
         :root {
             --primary-bg: white;
@@ -647,14 +658,12 @@
                     this.toggleOptionsMenu(false); 
                 });
                 this.dom.importDataMenuBtn.addEventListener('click', () => {
-                    this.dom.importFileInput.click(); // This will trigger the 'change' event below
-                    // Menu will be closed by the document click listener if successful,
-                    // or can be forced closed here too.
+                    this.dom.importFileInput.click(); 
                 });
                 
                 this.dom.importFileInput.addEventListener('change', (event) => {
                     this.importData(event);
-                    this.toggleOptionsMenu(false); // Close menu after file selection attempt
+                    this.toggleOptionsMenu(false); 
                 });
 
                 document.addEventListener('click', (event) => {
@@ -1129,22 +1138,41 @@
             lastTouchEnd = now;
         }, { passive: false });
 
+        // Service Worker Registration using data URL
         if ('serviceWorker' in navigator) {
             const swCode = `
-                self.addEventListener('install', (e) => e.waitUntil(self.skipWaiting()));
-                self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+                self.addEventListener('install', (e) => {
+                    console.log('Service Worker: Install event');
+                    e.waitUntil(self.skipWaiting());
+                });
+                self.addEventListener('activate', (e) => {
+                    console.log('Service Worker: Activate event');
+                    e.waitUntil(self.clients.claim());
+                });
                 self.addEventListener('fetch', (e) => {
+                    // This simple fetch handler is required for PWA installability.
+                    // It just passes the request through. For offline capabilities,
+                    // a caching strategy would be needed here.
+                    // console.log('Service Worker: Fetching', e.request.url);
                     e.respondWith(
-                        fetch(e.request).catch(() => {
-                            console.log('Network request failed for:', e.request.url);
+                        fetch(e.request).catch((error) => {
+                            console.warn('Service Worker: Fetch failed for', e.request.url, error);
+                            // Optional: return a custom offline page or a specific error response
+                            // return new Response("Network error. You are offline.", { status: 503, headers: { 'Content-Type': 'text/plain' } });
                         })
                     );
                 }); 
             `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(blob))
-                .then(reg => console.log('Service Worker registered.', reg))
-                .catch(err => console.warn('Service Worker registration failed:', err));
+            // Encode the SW code to be used in a data URL
+            const swDataUrl = 'data:application/javascript,' + encodeURIComponent(swCode);
+
+            navigator.serviceWorker.register(swDataUrl)
+                .then(registration => {
+                    console.log('Service Worker registered successfully with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.warn('Service Worker registration failed:', error);
+                });
         }
     </script>
 </body>
