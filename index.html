@@ -348,12 +348,12 @@
             font-weight: var(--action-font-weight);
         }
 
-        /* Override for Action Choice modal buttons to have same base font weight */
+        /* Ensure Action Choice buttons have consistent (base) font weight */
         #actionChoiceViewRecordsBtn, 
         #actionChoiceLogBtn {
             font-weight: var(--base-font-weight);
         }
-        /* Retain accent color for Log Dose button in Action Choice modal */
+        /* Retain accent color for Log Dose button in Action Choice modal for primary action cue */
          #actionChoiceLogBtn {
             color: var(--accent-color);
          }
@@ -530,7 +530,7 @@
             font-weight: var(--base-font-weight);
             color: var(--accent-color);
             background: none;
-            border: none; /* No border for full-width top-bordered button */
+            border: none; 
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -784,19 +784,20 @@
                 this.setupEventListeners();
                 window.addEventListener('popstate', (event) => this.handlePopState(event));
                 if (!history.state || history.state.screen !== 'main') {
-                    history.replaceState({ screen: 'main' }, "Main Screen", "#main");
+                    history.replaceState({ screen: 'main', medId: null }, "Main Screen", "#main");
                 }
                 this.currentHistoryState = 'main';
             }
             
             handlePopState(event) {
-                const targetScreen = event.state ? event.state.screen : null;
-                // console.log("PWA DEBUG: Popstate event. Target screen:", targetScreen, "Current history state:", this.currentHistoryState);
+                const state = event.state;
+                const targetScreen = state ? state.screen : null;
+                console.log("PWA DEBUG: Popstate event. Target screen:", targetScreen, "Target Med ID:", state ? state.medId : "N/A");
 
                 if (targetScreen === 'main' && this.recordsScreenActive()) {
                     this.hideRecords(true); 
-                } else if (targetScreen === 'records' && !this.recordsScreenActive() && event.state.medId) {
-                    this.showRecords(event.state.medId, true); 
+                } else if (targetScreen === 'records' && !this.recordsScreenActive() && state.medId) {
+                    this.showRecords(state.medId, true); 
                 } else if (!targetScreen && this.recordsScreenActive()) { 
                     this.hideRecords(true);
                 }
@@ -874,7 +875,7 @@
                 this.dom.backToMainBtn.addEventListener('click', () => {
                     if (history.state?.screen === 'records') {
                         history.back();
-                    } else {
+                    } else { // Fallback if history state is unexpected
                         this.hideRecords(false); 
                     }
                 });
@@ -1029,12 +1030,15 @@
             
             deleteMedication() {
                 if (!this.editingMedicationId) return;
-                const medicationName = this.medications.find(m => m.id === this.editingMedicationId)?.name || 'Medication';
-                this.medications = this.medications.filter(m => m.id !== this.editingMedicationId);
+                const currentMedId = this.editingMedicationId; // Store before it's nulled
+                const medicationName = this.medications.find(m => m.id === currentMedId)?.name || 'Medication';
+                
+                this.medications = this.medications.filter(m => m.id !== currentMedId);
                 this.saveMedications(); 
-                this.hideMedicationModal();
-                if (this.currentRecordsMedication && this.currentRecordsMedication.id === this.editingMedicationId) {
-                    if (history.state?.screen === 'records') {
+                this.hideMedicationModal(); // This will nullify this.editingMedicationId
+
+                if (this.currentRecordsMedication && this.currentRecordsMedication.id === currentMedId) {
+                    if (history.state?.screen === 'records' && history.state?.medId === currentMedId) {
                          history.back(); 
                     } else {
                         this.hideRecords(false); 
@@ -1042,7 +1046,7 @@
                 }
                 this.renderMedications(); 
                 this.showToast(`${medicationName} deleted.`);
-                this.editingMedicationId = null;
+                // this.editingMedicationId is already nulled by hideMedicationModal
                 this.confirmingDeleteMedication = false;
             }
 
@@ -1059,8 +1063,8 @@
             }
             
             prepareRecordEntryModal(timestampToEdit = null) {
-                if (!this.currentRecordsMedication) { // Check if we are on a records screen
-                    this.showToast("Please open a medication's records first.");
+                if (!this.currentRecordsMedication) { 
+                    this.showToast("Error: No medication selected to add/edit record for.");
                     return;
                 }
                 this.activeMedicationForRecordEntry = this.currentRecordsMedication; 
@@ -1262,12 +1266,12 @@
                 this.currentRecordsMedication = medication;
                 
                 this.dom.recordsTitle.textContent = medication.name;
-                this.updateRecordsDisplay(); 
                 
                 this.dom.mainScreen.style.transform = '';
                 this.dom.recordsScreen.style.transform = '';
 
-                this.dom.recordsScreen.classList.add('active');
+                this.dom.recordsScreen.classList.add('active'); 
+                this.updateRecordsDisplay(); // Call AFTER .active class is added
                 this.dom.mainScreen.classList.add('viewing-records');
 
                 const onTransitionEnd = () => {
@@ -1284,12 +1288,14 @@
                 this.isScreenTransitioning = true;
                 
                 if (!isFromPopState && history.state?.screen === 'records') {
-                     // If not from popstate, and we are on records, it means user clicked back arrow icon.
-                     // history.back() was already called by the button's event listener.
-                     // So we just let the popstate handler do its job.
-                } else if (isFromPopState || !history.state || history.state.screen !== 'records') {
-                    // If it IS from popstate OR if history state is already not 'records' (e.g., direct call after delete)
-                    // then animate out.
+                     // This case is for UI elements like the back arrow triggering a history change
+                     // history.back() is called by the event listener directly.
+                     // This function will then be called again via popstate with isFromPopState = true.
+                     // So, if !isFromPopState, we don't immediately animate out if a history action is pending.
+                     // However, if called due to deletion, or if state is already 'main', we proceed.
+                }
+                 
+                if (isFromPopState || !history.state || history.state.screen !== 'records') {
                     this.dom.mainScreen.style.transform = '';
                     this.dom.recordsScreen.style.transform = '';
                     this.dom.recordsScreen.classList.remove('active');
@@ -1305,10 +1311,10 @@
                     this.isScreenTransitioning = false;
                     this.renderMedications(); 
                 };
-
+                
                 const recordsScreenIsActuallyVisible = this.dom.recordsScreen.classList.contains('active') || getComputedStyle(this.dom.recordsScreen).transform !== 'none';
 
-                if (recordsScreenIsActuallyVisible) {
+                if (recordsScreenIsActuallyVisible || isFromPopState) {
                      this.dom.recordsScreen.addEventListener('transitionend', onTransitionEnd, { once: true });
                 } else { 
                     this.currentRecordsMedication = null;
@@ -1345,9 +1351,9 @@
                         });
                     });
                     if (this.recordsScreenActive()) {
-                        requestAnimationFrame(() => { 
+                        setTimeout(() => { // Ensure DOM has updated
                             this.dom.recordsContent.scrollTop = this.dom.recordsContent.scrollHeight;
-                        });
+                        }, 0);
                     }
                 }
             }
