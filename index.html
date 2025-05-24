@@ -19,15 +19,17 @@
             --border-color-light: #EEEEEE;
             --border-color-input: #E0E0E0;
             --accent-color: #92A3A7;
-            --action-color-undo: #D32F2F; /* Stronger Red */
-            --action-color-redo: #2196F3; /* Clearer Blue */
+            --action-color-undo: #D32F2F; 
+            --action-color-redo: #2196F3; 
             --action-color-delete: #D32F2F; 
             --disabled-color: #CCCCCC;
             --modal-backdrop-color: rgba(0, 0, 0, 0.4);
             --toast-bg: rgba(74, 74, 74, 0.9);
             
             --font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-            --base-font-weight: 300;
+            --base-font-weight: 300; 
+            --action-font-weight: 500; 
+
 
             --transition-duration: 0.3s;
             --transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -124,45 +126,18 @@
         .medication-item {
             position: relative;
             border-bottom: 1px solid var(--border-color-light);
-            cursor: pointer;
-            overflow: hidden;
+            cursor: pointer; 
+            overflow: hidden; 
         }
 
         .medication-item:last-child {
             border-bottom: none;
         }
-
-        .medication-swipe-actions {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start; 
-            z-index: 1; 
-            padding: 0 20px;
-            color: var(--text-color-medication-name); 
-            opacity: 0; 
-            transition: opacity 0.15s ease-in-out;
-            pointer-events: none; 
-        }
-        .medication-item.swiping-right .medication-swipe-actions {
-            opacity: 0.8;
-        }
-
-        .swipe-action-text {
-            font-weight: 500;
-            font-size: 16px;
-            text-transform: uppercase;
-        }
-
-        .medication-content-wrapper {
+        
+        .medication-content-wrapper { 
             position: relative;
             z-index: 2; 
             background: inherit; 
-            transition: transform 0.2s ease-out; 
         }
 
         .medication-content { 
@@ -185,8 +160,8 @@
             font-weight: var(--base-font-weight);
         }
         .medication-last-consumed {
-            font-size: 10px; /* Smaller font for last consumed */
-            color: rgba(255, 255, 255, 0.75); /* Slightly more transparent */
+            font-size: 10px; 
+            color: rgba(255, 255, 255, 0.75); 
             font-weight: var(--base-font-weight);
             margin-top: 6px;
         }
@@ -321,7 +296,8 @@
             flex-grow: 1; 
             text-align: center; 
         }
-        .modal-header .delete-med-icon-btn { 
+        .modal-header .delete-med-icon-btn,
+        .modal-header .record-entry-delete-btn { 
             flex-shrink: 0; 
         }
         #actionChoiceModal .modal-header h2, 
@@ -346,7 +322,7 @@
             border: none;
             background: none;
             font-size: 16px;
-            font-weight: var(--base-font-weight);
+            font-weight: var(--base-font-weight); 
             cursor: pointer;
             transition: background-color 0.2s ease, color 0.2s ease;
             letter-spacing: -0.2px;
@@ -362,15 +338,26 @@
 
         .modal-confirm-btn { 
             color: var(--accent-color);
-            font-weight: 500; 
+            font-weight: var(--action-font-weight); 
         }
         .modal-confirm-btn:hover {
             background: #e8f0f2;
         }
         .modal-confirm-btn.delete-confirm-style { 
             color: var(--action-color-delete);
-            font-weight: 500;
+            font-weight: var(--action-font-weight);
         }
+
+        /* Override for Action Choice modal buttons to have same base font weight */
+        #actionChoiceViewRecordsBtn, 
+        #actionChoiceLogBtn {
+            font-weight: var(--base-font-weight);
+        }
+        /* Retain accent color for Log Dose button in Action Choice modal */
+         #actionChoiceLogBtn {
+            color: var(--accent-color);
+         }
+
 
         #modalTitle { 
         }
@@ -413,19 +400,28 @@
             font-weight: var(--base-font-weight);
             color: var(--text-color-header);
         }
-
-        .form-group input:focus {
-            outline: none;
-            border-bottom-color: var(--accent-color);
+        .form-group input[type="date"], .form-group input[type="time"] {
+            padding: 12px 10px; 
+            border: 1px solid var(--border-color-input);
+            border-radius: 4px;
         }
 
-        #deleteConfirmationText {
+
+        #deleteConfirmationText { 
             padding: 20px;
             text-align: center;
             color: var(--text-color-light);
             font-size: 15px;
             display: none; 
         }
+        #recordEntryDeleteConfirmationText { 
+             padding: 10px 24px 20px;
+             text-align: center;
+             color: var(--text-color-light);
+             font-size: 15px;
+             display: none;
+        }
+
 
         #actionChoiceModal .modal-body { 
             display: none; 
@@ -457,7 +453,7 @@
             text-transform: uppercase;
             flex-grow: 1; 
             text-align: center; 
-            margin: 0 10px; 
+            margin: 0 5px; 
         }
 
         .header-action-btn {
@@ -484,24 +480,35 @@
         }
 
         .record-item {
-            padding: 12px 0; 
+            padding: 12px 0px; 
             font-size: 14px;
             color: var(--text-color-light);
             font-weight: var(--base-font-weight);
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between; 
             border-bottom: 1px solid var(--border-color-light);
+        }
+        .record-item span { 
+            flex-grow: 1;
         }
         .record-item:last-child {
             border-bottom: none;
         }
-
-        .record-item::before {
-            content: '•';
-            color: var(--accent-color);
-            font-size: 16px;
-            padding-left: 4px; 
+        
+        .record-entry-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-color-light);
+            cursor: pointer;
+            padding: 8px;
+            margin-left: 10px;
+        }
+        .record-entry-action-btn svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+            fill: currentColor;
         }
 
         .empty-records {
@@ -513,42 +520,27 @@
             padding: 0 20px; 
         }
 
-        .undo-redo-buttons {
-            display: flex;
+        .records-footer-action {
             border-top: 1px solid var(--border-color-light);
         }
-
-        .undo-btn, .redo-btn {
-            flex: 1;
-            background: none;
-            border: none;
-            padding: 20px;
+        #addManualRecordBtn { 
+            width: 100%;
+            padding: 18px 0;
             font-size: 16px;
             font-weight: var(--base-font-weight);
+            color: var(--accent-color);
+            background: none;
+            border: none; /* No border for full-width top-bordered button */
             cursor: pointer;
-            transition: background-color 0.2s ease, color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s ease;
             letter-spacing: -0.2px;
         }
-        
-        .redo-btn {
-            border-right: 1px solid var(--border-color-light); 
-            color: var(--action-color-redo); /* New color */
-        }
-        .redo-btn:hover:not(:disabled) {
-            background: #e3f2fd; /* Lighter blue hover */
-        }
-
-        .undo-btn { 
-            color: var(--action-color-undo); /* New color */
-        }
-        .undo-btn:hover:not(:disabled) {
-            background: #ffebee; /* Lighter red hover */
-        }
-
-        .undo-btn:disabled, .redo-btn:disabled {
-            color: var(--disabled-color);
-            cursor: not-allowed;
-            background: none;
+        #addManualRecordBtn:active {
+            background: #F8F8F8;
         }
 
         .toast {
@@ -636,9 +628,8 @@
                 </div>
                 <div class="records-content" id="recordsContent">
                 </div>
-                <div class="undo-redo-buttons">
-                    <button class="redo-btn" id="redoBtn" onclick="tracker.redoLastRecord()">Redo</button>
-                    <button class="undo-btn" id="undoBtn" onclick="tracker.undoLastRecord()">Undo</button>
+                <div class="records-footer-action">
+                     <button id="addManualRecordBtn" class="action-button">+ Add Manual Record</button>
                 </div>
             </div>
         </div>
@@ -688,6 +679,33 @@
         </div>
     </div>
 
+    <div class="modal" id="recordEntryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="recordEntryModalTitle">Add Manual Record</h2>
+                 <button class="delete-med-icon-btn" id="deleteRecordEntryBtn" aria-label="Delete Record Entry" style="display:none;"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+            </div>
+            <form id="recordEntryForm">
+                <div class="modal-body" id="recordEntryFormBody">
+                    <div class="form-group">
+                        <label for="recordEntryDate">Date</label>
+                        <input type="date" id="recordEntryDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="recordEntryTime">Time</label>
+                        <input type="time" id="recordEntryTime" required>
+                    </div>
+                </div>
+                <div id="recordEntryDeleteConfirmationText">Are you sure you want to delete this record entry? This action cannot be undone.</div>
+                <div class="modal-buttons">
+                    <button type="button" class="modal-btn modal-cancel-btn" id="recordEntryCancelBtn">Cancel</button>
+                    <button type="submit" class="modal-btn modal-confirm-btn" id="recordEntryActionBtn">Add Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <div class="toast" id="toast"></div>
 
@@ -716,8 +734,7 @@
                     backToMainBtn: document.getElementById('backToMainBtn'), 
                     recordsTitle: document.getElementById('recordsTitle'),
                     recordsContent: document.getElementById('recordsContent'),
-                    undoBtn: document.getElementById('undoBtn'),
-                    redoBtn: document.getElementById('redoBtn'),
+                    addManualRecordBtn: document.getElementById('addManualRecordBtn'),
                     toast: document.getElementById('toast'),
                     addMedicationFooterBtn: document.getElementById('addMedicationFooterBtn'),
                     moreOptionsTriggerBtn: document.getElementById('moreOptionsTriggerBtn'),
@@ -730,19 +747,33 @@
                     actionChoiceModalTitle: document.getElementById('actionChoiceModalTitle'),
                     actionChoiceLogBtn: document.getElementById('actionChoiceLogBtn'),
                     actionChoiceViewRecordsBtn: document.getElementById('actionChoiceViewRecordsBtn'),
+
+                    recordEntryModal: document.getElementById('recordEntryModal'),
+                    recordEntryModalTitle: document.getElementById('recordEntryModalTitle'),
+                    recordEntryForm: document.getElementById('recordEntryForm'),
+                    recordEntryFormBody: document.getElementById('recordEntryFormBody'),
+                    recordEntryDate: document.getElementById('recordEntryDate'),
+                    recordEntryTime: document.getElementById('recordEntryTime'),
+                    recordEntryDeleteConfirmationText: document.getElementById('recordEntryDeleteConfirmationText'),
+                    recordEntryCancelBtn: document.getElementById('recordEntryCancelBtn'),
+                    recordEntryActionBtn: document.getElementById('recordEntryActionBtn'),
+                    deleteRecordEntryBtn: document.getElementById('deleteRecordEntryBtn')
                 };
 
                 this.medications = JSON.parse(localStorage.getItem('medications') || '[]');
                 this.currentRecordsMedication = null;
                 this.editingMedicationId = null; 
-                this.confirmingDelete = false; 
+                this.confirmingDeleteMedication = false; 
                 this.actionChoiceMedicationId = null; 
+                
+                this.editingRecordTimestamp = null; 
+                this.confirmingDeleteRecordEntry = false;
+                this.activeMedicationForRecordEntry = null; 
 
-                this.undoStack = [];
-                this.unifiedSwipeListenerCleanup = null;
+
                 this.isScreenTransitioning = false;
-                this.activeItemGestures = new Set();
                 this.toastTimeout = null;
+                this.currentHistoryState = null; 
 
                 this.init();
             }
@@ -751,11 +782,35 @@
                 this.renderMedications();
                 this.startTimeUpdater();
                 this.setupEventListeners();
+                window.addEventListener('popstate', (event) => this.handlePopState(event));
+                if (!history.state || history.state.screen !== 'main') {
+                    history.replaceState({ screen: 'main' }, "Main Screen", "#main");
+                }
+                this.currentHistoryState = 'main';
             }
+            
+            handlePopState(event) {
+                const targetScreen = event.state ? event.state.screen : null;
+                // console.log("PWA DEBUG: Popstate event. Target screen:", targetScreen, "Current history state:", this.currentHistoryState);
+
+                if (targetScreen === 'main' && this.recordsScreenActive()) {
+                    this.hideRecords(true); 
+                } else if (targetScreen === 'records' && !this.recordsScreenActive() && event.state.medId) {
+                    this.showRecords(event.state.medId, true); 
+                } else if (!targetScreen && this.recordsScreenActive()) { 
+                    this.hideRecords(true);
+                }
+                this.currentHistoryState = targetScreen || 'main';
+            }
+
+            recordsScreenActive() {
+                return this.dom.recordsScreen.classList.contains('active');
+            }
+
 
             startTimeUpdater() {
                 setInterval(() => {
-                    if (this.activeItemGestures.size === 0 && !this.isScreenTransitioning) {
+                    if (!this.isScreenTransitioning) {
                         this.renderMedications();
                     }
                 }, 1000);
@@ -770,7 +825,7 @@
                     if (e.target === this.dom.medicationModal) this.hideMedicationModal();
                 });
                 this.dom.modalCancelBtn.addEventListener('click', () => {
-                    if (this.confirmingDelete) {
+                    if (this.confirmingDeleteMedication) {
                         const medToEdit = this.medications.find(m => m.id === this.editingMedicationId);
                         if (medToEdit) this.prepareEditModal(medToEdit);
                         else this.hideMedicationModal(); 
@@ -813,10 +868,17 @@
                     }
                 });
                 this.dom.deleteMedIconBtn.addEventListener('click', () => {
-                    this.prepareDeleteConfirmation();
+                    this.prepareDeleteMedicationConfirmation();
                 });
 
-                this.dom.backToMainBtn.addEventListener('click', () => this.hideRecords());
+                this.dom.backToMainBtn.addEventListener('click', () => {
+                    if (history.state?.screen === 'records') {
+                        history.back();
+                    } else {
+                        this.hideRecords(false); 
+                    }
+                });
+
 
                 this.dom.actionChoiceModal.addEventListener('click', (e) => {
                     if (e.target === this.dom.actionChoiceModal) this.hideActionChoiceModal();
@@ -828,6 +890,27 @@
                 this.dom.actionChoiceViewRecordsBtn.addEventListener('click', () => {
                     if (this.actionChoiceMedicationId) this.showRecords(this.actionChoiceMedicationId);
                     this.hideActionChoiceModal();
+                });
+
+                this.dom.addManualRecordBtn.addEventListener('click', () => {
+                    this.prepareRecordEntryModal(); 
+                });
+                this.dom.recordEntryModal.addEventListener('click', (e) => {
+                    if (e.target === this.dom.recordEntryModal) this.hideRecordEntryModal();
+                });
+                this.dom.recordEntryForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleRecordEntryFormSubmit();
+                });
+                this.dom.recordEntryCancelBtn.addEventListener('click', () => {
+                     if (this.confirmingDeleteRecordEntry) {
+                        this.prepareRecordEntryModal(this.editingRecordTimestamp); 
+                    } else {
+                        this.hideRecordEntryModal();
+                    }
+                });
+                this.dom.deleteRecordEntryBtn.addEventListener('click', () => {
+                    this.prepareDeleteRecordEntryConfirmation();
                 });
             }
             
@@ -841,7 +924,7 @@
 
             prepareAddModal() {
                 this.editingMedicationId = null;
-                this.confirmingDelete = false;
+                this.confirmingDeleteMedication = false;
                 this.dom.medicationForm.reset();
                 this.dom.modalTitle.textContent = 'Add Medication';
                 this.dom.modalActionBtn.textContent = 'Add';
@@ -858,7 +941,7 @@
             prepareEditModal(medication) {
                 if (!medication) return;
                 this.editingMedicationId = medication.id;
-                this.confirmingDelete = false;
+                this.confirmingDeleteMedication = false;
                 this.dom.modalTitle.textContent = 'Edit Medication'; 
                 this.dom.modalMedicationName.value = medication.name;
                 this.dom.modalTimeBetween.value = medication.timeBetweenHours;
@@ -873,12 +956,12 @@
                 this.dom.medicationModal.classList.add('active');
             }
 
-            prepareDeleteConfirmation() {
+            prepareDeleteMedicationConfirmation() {
                 if (!this.editingMedicationId) return;
                 const medication = this.medications.find(m => m.id === this.editingMedicationId);
                 if (!medication) return;
 
-                this.confirmingDelete = true;
+                this.confirmingDeleteMedication = true;
                 this.dom.modalTitle.textContent = `Delete ${medication.name}?`; 
                 this.dom.medicationFormBody.style.display = 'none';
                 this.dom.deleteConfirmationText.style.display = 'block';
@@ -892,7 +975,7 @@
             hideMedicationModal() {
                 this.dom.medicationModal.classList.remove('active');
                 this.editingMedicationId = null;
-                this.confirmingDelete = false;
+                this.confirmingDeleteMedication = false;
                 this.dom.modalTitle.textContent = 'Add Medication';
                 this.dom.modalActionBtn.textContent = 'Add';
                 this.dom.modalActionBtn.className = 'modal-btn modal-confirm-btn';
@@ -904,7 +987,7 @@
             }
 
             handleModalFormSubmit() {
-                if (this.confirmingDelete) {
+                if (this.confirmingDeleteMedication) {
                     this.deleteMedication();
                     return;
                 }
@@ -950,11 +1033,17 @@
                 this.medications = this.medications.filter(m => m.id !== this.editingMedicationId);
                 this.saveMedications(); 
                 this.hideMedicationModal();
-                this.hideRecords(); 
+                if (this.currentRecordsMedication && this.currentRecordsMedication.id === this.editingMedicationId) {
+                    if (history.state?.screen === 'records') {
+                         history.back(); 
+                    } else {
+                        this.hideRecords(false); 
+                    }
+                }
                 this.renderMedications(); 
                 this.showToast(`${medicationName} deleted.`);
                 this.editingMedicationId = null;
-                this.confirmingDelete = false;
+                this.confirmingDeleteMedication = false;
             }
 
             showActionChoiceModal(medication) {
@@ -967,6 +1056,133 @@
             hideActionChoiceModal() {
                 this.dom.actionChoiceModal.classList.remove('active');
                 this.actionChoiceMedicationId = null;
+            }
+            
+            prepareRecordEntryModal(timestampToEdit = null) {
+                if (!this.currentRecordsMedication) { // Check if we are on a records screen
+                    this.showToast("Please open a medication's records first.");
+                    return;
+                }
+                this.activeMedicationForRecordEntry = this.currentRecordsMedication; 
+                this.editingRecordTimestamp = timestampToEdit;
+                this.confirmingDeleteRecordEntry = false;
+                this.dom.recordEntryFormBody.style.display = 'block';
+                this.dom.recordEntryDeleteConfirmationText.style.display = 'none';
+                this.dom.recordEntryActionBtn.className = 'modal-btn modal-confirm-btn';
+                this.dom.recordEntryCancelBtn.textContent = 'Cancel';
+
+
+                if (timestampToEdit) {
+                    this.dom.recordEntryModalTitle.textContent = 'Edit Record Entry';
+                    this.dom.recordEntryActionBtn.textContent = 'Save Changes';
+                    this.dom.deleteRecordEntryBtn.style.display = 'block';
+
+                    const date = new Date(timestampToEdit);
+                    const year = date.getFullYear();
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const day = date.getDate().toString().padStart(2, '0');
+                    this.dom.recordEntryDate.value = `${year}-${month}-${day}`;
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    this.dom.recordEntryTime.value = `${hours}:${minutes}`;
+                } else {
+                    this.dom.recordEntryModalTitle.textContent = 'Add Manual Record';
+                    this.dom.recordEntryActionBtn.textContent = 'Add Record';
+                    this.dom.deleteRecordEntryBtn.style.display = 'none';
+                    this.dom.recordEntryForm.reset(); 
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                    const day = now.getDate().toString().padStart(2, '0');
+                    this.dom.recordEntryDate.value = `${year}-${month}-${day}`;
+                    const hours = now.getHours().toString().padStart(2, '0');
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    this.dom.recordEntryTime.value = `${hours}:${minutes}`;
+                }
+                this.dom.recordEntryModal.classList.add('active');
+            }
+
+            hideRecordEntryModal() {
+                this.dom.recordEntryModal.classList.remove('active');
+                this.editingRecordTimestamp = null;
+                this.confirmingDeleteRecordEntry = false;
+                this.activeMedicationForRecordEntry = null; 
+            }
+
+            handleRecordEntryFormSubmit() {
+                const targetMedication = this.activeMedicationForRecordEntry; 
+
+                if (this.confirmingDeleteRecordEntry) {
+                    this.deleteRecordEntry(); 
+                    return;
+                }
+
+                if (!targetMedication) {
+                    this.showToast('Error: No medication context for record entry.');
+                    this.hideRecordEntryModal();
+                    return;
+                }
+
+                const dateStr = this.dom.recordEntryDate.value;
+                const timeStr = this.dom.recordEntryTime.value;
+
+                if (!dateStr || !timeStr) {
+                    this.showToast('Please select both date and time.');
+                    return;
+                }
+                
+                const localDateTime = new Date(`${dateStr}T${timeStr}`);
+                if (isNaN(localDateTime.getTime())) {
+                    this.showToast('Invalid date or time format.');
+                    return;
+                }
+                const newTimestamp = localDateTime.getTime();
+                
+                if (this.editingRecordTimestamp) { 
+                    const recordIndex = targetMedication.records.indexOf(this.editingRecordTimestamp);
+                    if (recordIndex > -1) {
+                        targetMedication.records.splice(recordIndex, 1, newTimestamp);
+                        this.showToast('Record entry updated.');
+                    } else {
+                         this.showToast('Original record not found for update.');
+                    }
+                } else { 
+                    targetMedication.records.push(newTimestamp);
+                    this.showToast('Manual record added.');
+                }
+                
+                targetMedication.records.sort((a, b) => a - b); 
+                this.saveAndRender(); 
+                this.updateRecordsDisplay(); 
+                this.hideRecordEntryModal();
+            }
+
+            prepareDeleteRecordEntryConfirmation() {
+                if (!this.editingRecordTimestamp || !this.activeMedicationForRecordEntry) return;
+                this.confirmingDeleteRecordEntry = true;
+                this.dom.recordEntryModalTitle.textContent = 'Delete This Entry?';
+                this.dom.recordEntryFormBody.style.display = 'none';
+                this.dom.recordEntryDeleteConfirmationText.style.display = 'block';
+                this.dom.deleteRecordEntryBtn.style.display = 'none';
+                this.dom.recordEntryActionBtn.textContent = 'Confirm Delete';
+                this.dom.recordEntryActionBtn.className = 'modal-btn modal-confirm-btn delete-confirm-style';
+                this.dom.recordEntryCancelBtn.textContent = 'Cancel';
+            }
+
+            deleteRecordEntry() {
+                const targetMedication = this.activeMedicationForRecordEntry;
+                if (!targetMedication || this.editingRecordTimestamp === null) return;
+                
+                const recordIndex = targetMedication.records.indexOf(this.editingRecordTimestamp);
+                if (recordIndex > -1) {
+                    targetMedication.records.splice(recordIndex, 1);
+                    this.saveAndRender();
+                    this.updateRecordsDisplay();
+                    this.showToast('Record entry deleted.');
+                } else {
+                    this.showToast('Could not find record to delete.');
+                }
+                this.hideRecordEntryModal();
             }
 
 
@@ -1027,21 +1243,26 @@
                 this.showToast(`${medication.name} logged.`);
             }
 
-            showRecords(id) {
-                if (this.isScreenTransitioning) return;
+            showRecords(id, isFromPopState = false) {
+                if (this.isScreenTransitioning && !isFromPopState) return; 
                 const medication = this.medications.find(m => m.id === id);
+                
                 if (!medication) {
                     this.hideRecords(); 
                     return;
                 }
 
+                if (!isFromPopState && (!history.state || history.state.screen !== 'records' || history.state.medId !== id) ) {
+                    history.pushState({ screen: 'records', medId: id }, `Records - ${medication.name}`, `#records/${id}`);
+                }
+                this.currentHistoryState = 'records';
+
+
                 this.isScreenTransitioning = true;
                 this.currentRecordsMedication = medication;
-                this.undoStack = [];
                 
                 this.dom.recordsTitle.textContent = medication.name;
-                this.updateRecordsDisplay(); // This will also call auto-scroll
-                this.updateUndoRedoButtons();
+                this.updateRecordsDisplay(); 
                 
                 this.dom.mainScreen.style.transform = '';
                 this.dom.recordsScreen.style.transform = '';
@@ -1052,62 +1273,49 @@
                 const onTransitionEnd = () => {
                     this.dom.recordsScreen.removeEventListener('transitionend', onTransitionEnd);
                     this.isScreenTransitioning = false;
-                    this.setupUnifiedSwipeToHideRecords();
                 };
                 this.dom.recordsScreen.addEventListener('transitionend', onTransitionEnd, { once: true });
             }
 
-            hideRecords() {
-                if (this.isScreenTransitioning && this.currentRecordsMedication) return; 
+            hideRecords(isFromPopState = false) {
+                if (this.isScreenTransitioning && this.currentRecordsMedication && !isFromPopState) return; 
+                if (!this.recordsScreenActive() && !isFromPopState) return; 
                 
                 this.isScreenTransitioning = true;
-                this.removeUnifiedSwipeToHideRecords();
                 
-                this.dom.mainScreen.style.transform = '';
-                this.dom.recordsScreen.style.transform = '';
+                if (!isFromPopState && history.state?.screen === 'records') {
+                     // If not from popstate, and we are on records, it means user clicked back arrow icon.
+                     // history.back() was already called by the button's event listener.
+                     // So we just let the popstate handler do its job.
+                } else if (isFromPopState || !history.state || history.state.screen !== 'records') {
+                    // If it IS from popstate OR if history state is already not 'records' (e.g., direct call after delete)
+                    // then animate out.
+                    this.dom.mainScreen.style.transform = '';
+                    this.dom.recordsScreen.style.transform = '';
+                    this.dom.recordsScreen.classList.remove('active');
+                    this.dom.mainScreen.classList.remove('viewing-records');
+                }
+                this.currentHistoryState = 'main';
 
-                this.dom.recordsScreen.classList.remove('active');
-                this.dom.mainScreen.classList.remove('viewing-records');
 
                 const onTransitionEnd = () => {
                     this.dom.recordsScreen.removeEventListener('transitionend', onTransitionEnd);
                     this.currentRecordsMedication = null;
+                    this.activeMedicationForRecordEntry = null; 
                     this.isScreenTransitioning = false;
                     this.renderMedications(); 
                 };
-                if (this.dom.recordsScreen.classList.contains('active') || getComputedStyle(this.dom.recordsScreen).transform !== 'none') {
+
+                const recordsScreenIsActuallyVisible = this.dom.recordsScreen.classList.contains('active') || getComputedStyle(this.dom.recordsScreen).transform !== 'none';
+
+                if (recordsScreenIsActuallyVisible) {
                      this.dom.recordsScreen.addEventListener('transitionend', onTransitionEnd, { once: true });
                 } else { 
                     this.currentRecordsMedication = null;
+                    this.activeMedicationForRecordEntry = null;
                     this.isScreenTransitioning = false;
                     this.renderMedications();
                 }
-            }
-
-            undoLastRecord() {
-                if (!this.currentRecordsMedication || this.currentRecordsMedication.records.length === 0) {
-                    this.showToast(this.currentRecordsMedication ? 'No records to undo.' : 'No medication selected.');
-                    return;
-                }
-                const removedRecord = this.currentRecordsMedication.records.pop();
-                this.undoStack.push(removedRecord);
-                this.saveAndRender();
-                this.updateRecordsDisplay();
-                this.updateUndoRedoButtons();
-                this.showToast('Record removed.');
-            }
-
-            redoLastRecord() {
-                if (!this.currentRecordsMedication || this.undoStack.length === 0) {
-                    this.showToast(this.currentRecordsMedication ? 'Nothing to redo.' : 'No medication selected.');
-                    return;
-                }
-                const recordToRestore = this.undoStack.pop();
-                this.currentRecordsMedication.records.push(recordToRestore);
-                this.saveAndRender();
-                this.updateRecordsDisplay();
-                this.updateUndoRedoButtons();
-                this.showToast('Record restored.');
             }
 
             updateRecordsDisplay() {
@@ -1121,86 +1329,34 @@
                 } else {
                     const sortedRecords = [...records].sort((a, b) => a - b); 
                     this.dom.recordsContent.innerHTML = sortedRecords.map(timestamp => 
-                        `<div class="record-item">${this.formatDateTime(timestamp)}</div>`
+                        `<div class="record-item" data-timestamp="${timestamp}">
+                            <span>${this.formatDateTime(timestamp)}</span>
+                            <button class="record-entry-action-btn" data-timestamp="${timestamp}" aria-label="Edit or Delete Record Entry">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>
+                            </button>
+                        </div>`
                     ).join('');
-                    // Auto-scroll to the bottom (newest record)
-                    this.dom.recordsContent.scrollTop = this.dom.recordsContent.scrollHeight;
+                    
+                    this.dom.recordsContent.querySelectorAll('.record-entry-action-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            e.stopPropagation(); 
+                            const ts = parseInt(btn.dataset.timestamp);
+                            this.prepareRecordEntryModal(ts);
+                        });
+                    });
+                    if (this.recordsScreenActive()) {
+                        requestAnimationFrame(() => { 
+                            this.dom.recordsContent.scrollTop = this.dom.recordsContent.scrollHeight;
+                        });
+                    }
                 }
             }
 
-            updateUndoRedoButtons() {
-                const hasRecords = this.currentRecordsMedication && this.currentRecordsMedication.records && this.currentRecordsMedication.records.length > 0;
-                const hasUndoStack = this.undoStack && this.undoStack.length > 0;
-                this.dom.undoBtn.disabled = !hasRecords;
-                this.dom.redoBtn.disabled = !hasUndoStack;
+
+            getTimeSinceLastDose(med) { 
+                if (!med.records || med.records.length === 0) return Infinity;
+                return Date.now() - Math.max(...med.records); 
             }
-            
-            setupUnifiedSwipeToHideRecords() {
-                this.removeUnifiedSwipeToHideRecords(); 
-                let startX = 0, currentX = 0, isDragging = false;
-                const screenWidth = window.innerWidth;
-
-                const onStart = (e) => {
-                    if (this.isScreenTransitioning) return;
-                    const touch = e.touches ? e.touches[0] : e;
-                    startX = touch.clientX; currentX = 0; isDragging = false;
-                    this.dom.recordsScreen.style.transition = 'none';
-                    this.dom.mainScreen.style.transition = 'none';
-                };
-
-                const onMove = (e) => {
-                    if (this.isScreenTransitioning || !e.touches) return; 
-                    const touch = e.touches[0];
-                    const deltaX = touch.clientX - startX;
-                    if (deltaX <= 0) return; 
-
-                    e.preventDefault(); 
-                    currentX = deltaX;
-                    isDragging = deltaX > 10; 
-                    if (isDragging) {
-                        this.dom.recordsScreen.style.transform = `translateX(${currentX}px)`;
-                        this.dom.mainScreen.style.transform = `translateX(${-screenWidth + currentX}px)`;
-                    }
-                };
-
-                const onEnd = () => {
-                    if (this.isScreenTransitioning && !isDragging) return;
-                    this.dom.recordsScreen.style.transition = ''; 
-                    this.dom.mainScreen.style.transition = '';
-                    const threshold = screenWidth * 0.3;
-                    if (currentX > threshold && isDragging) {
-                        this.dom.mainScreen.style.transform = ''; 
-                        this.dom.recordsScreen.style.transform = ''; 
-                        this.hideRecords();
-                    } else {
-                        this.dom.recordsScreen.style.transform = 'translateX(0)';
-                        this.dom.mainScreen.style.transform = `translateX(-${screenWidth}px)`;
-                    }
-                    isDragging = false;
-                };
-                
-                const passiveFalse = { passive: false };
-                this.dom.recordsScreen.addEventListener('touchstart', onStart, passiveFalse);
-                this.dom.recordsScreen.addEventListener('touchmove', onMove, passiveFalse);
-                this.dom.recordsScreen.addEventListener('touchend', onEnd);
-                this.dom.recordsScreen.addEventListener('touchcancel', onEnd);
-
-                this.unifiedSwipeListenerCleanup = () => {
-                    this.dom.recordsScreen.removeEventListener('touchstart', onStart, passiveFalse);
-                    this.dom.recordsScreen.removeEventListener('touchmove', onMove, passiveFalse);
-                    this.dom.recordsScreen.removeEventListener('touchend', onEnd);
-                    this.dom.recordsScreen.removeEventListener('touchcancel', onEnd);
-                };
-            }
-
-            removeUnifiedSwipeToHideRecords() {
-                if (this.unifiedSwipeListenerCleanup) {
-                    this.unifiedSwipeListenerCleanup();
-                    this.unifiedSwipeListenerCleanup = null;
-                }
-            }
-
-            getTimeSinceLastDose(med) { return med.records.length === 0 ? Infinity : Date.now() - Math.max(...med.records); }
             getTimeUntilNextDose(med) { const ts = this.getTimeSinceLastDose(med); return Math.max(0, med.timeBetweenHours * 3600000 - ts); }
             isSafeToConsume(med) { return this.getTimeUntilNextDose(med) === 0; }
             getProgressRatio(med) { const ts = this.getTimeSinceLastDose(med); return ts === Infinity ? 0 : Math.min(1, ts / (med.timeBetweenHours * 3600000)); }
@@ -1236,152 +1392,22 @@
                 });
             }
 
-            setupItemSwipeGestures(element, medication) {
-                if (element.hasSwipeGesturesAttached) return;
-                element.hasSwipeGesturesAttached = true;
-                
-                const medicationContentWrapper = element.querySelector('.medication-content-wrapper');
-                if (!medicationContentWrapper) return; 
-
-                let startX = 0, currentX = 0, startY = 0;
-                let isItemDragMode = false;  
-                let isScreenSlideMode = false; 
-                let isTap = true; 
-                const gestureId = Math.random();
-                const screenWidth = window.innerWidth;
-                const itemActionThreshold = 80; 
-                const screenSlideInitiationThreshold = 15; 
-                const tapThreshold = 5; 
-
-                const onStart = (e) => {
-                    if (this.isScreenTransitioning || (this.activeItemGestures.size > 0 && !this.activeItemGestures.has(gestureId))) return;
-                    this.activeItemGestures.add(gestureId);
-                    const touch = e.touches ? e.touches[0] : e;
-                    startX = touch.clientX; startY = touch.clientY;
-                    currentX = 0; isItemDragMode = false; isScreenSlideMode = false; isTap = true;
-                    
-                    this.dom.mainScreen.style.transition = 'none';
-                    this.dom.recordsScreen.style.transition = 'none';
-                    medicationContentWrapper.style.transition = 'none'; 
-                    element.classList.remove('swiping-right'); 
-                };
-
-                const onMove = (e) => {
-                    if (!this.activeItemGestures.has(gestureId) || this.isScreenTransitioning) return;
-
-                    const touch = e.touches ? e.touches[0] : e;
-                    const deltaX = touch.clientX - startX;
-                    const deltaY = Math.abs(touch.clientY - startY);
-                    currentX = deltaX;
-
-                    if (Math.abs(deltaX) > tapThreshold || deltaY > tapThreshold) {
-                        isTap = false; 
-                    }
-
-                    if (isScreenSlideMode) {
-                        e.preventDefault();
-                        const mainScreenX = Math.max(-screenWidth, deltaX);
-                        const recordsScreenX = screenWidth + mainScreenX; 
-                        this.dom.mainScreen.style.transform = `translateX(${mainScreenX}px)`;
-                        this.dom.recordsScreen.style.transform = `translateX(${recordsScreenX}px)`;
+            setupItemSwipeGestures(element, medication) { 
+                if (element.hasClickActionAttached) return; 
+                element.hasClickActionAttached = true;
+            
+                element.addEventListener('click', (e) => {
+                    if (window.getSelection().toString()) { 
                         return;
                     }
-
-                    if (isItemDragMode) { 
-                         e.preventDefault();
-                         medicationContentWrapper.style.transform = `translateX(${Math.max(0, deltaX)}px)`;
-                         element.classList.add('swiping-right'); 
-                         return;
-                    }
-                    
-                    if (deltaX < -screenSlideInitiationThreshold && Math.abs(deltaX) > deltaY * 1.2) { 
-                        e.preventDefault();
-                        isScreenSlideMode = true;
-                        isItemDragMode = false; 
-                        medicationContentWrapper.style.transform = ''; 
-                        element.classList.remove('swiping-right');
-
-                        this.currentRecordsMedication = medication;
-                        this.dom.recordsTitle.textContent = medication.name;
-                        this.undoStack = [];
-                        this.updateRecordsDisplay();
-                        this.updateUndoRedoButtons();
-
-                        const initialMainScreenX = Math.max(-screenWidth, deltaX);
-                        const initialRecordsScreenX = screenWidth + initialMainScreenX;
-                        this.dom.mainScreen.style.transform = `translateX(${initialMainScreenX}px)`;
-                        this.dom.recordsScreen.style.transform = `translateX(${initialRecordsScreenX}px)`;
-
-                    } else if (deltaX > 10 && Math.abs(deltaX) > deltaY * 1.2) { 
-                        e.preventDefault();
-                        isItemDragMode = true;
-                        isScreenSlideMode = false; 
-                        medicationContentWrapper.style.transform = `translateX(${deltaX}px)`;
-                        element.classList.add('swiping-right');
-                    }
-                };
-
-                const onEnd = (e) => { 
-                    if (!this.activeItemGestures.has(gestureId)) return;
-                    this.activeItemGestures.delete(gestureId);
-
-                    this.dom.mainScreen.style.transition = ''; 
-                    this.dom.recordsScreen.style.transition = '';
-                    medicationContentWrapper.style.transition = ''; 
-                    element.classList.remove('swiping-right');
-
-                    if (isTap && !isItemDragMode && !isScreenSlideMode) {
-                        if (e) { 
-                            e.preventDefault(); 
-                            e.stopPropagation(); 
-                        }
-                        this.showActionChoiceModal(medication);
-                    } else if (isScreenSlideMode) { 
-                        const slideCompleteThreshold = screenWidth * 0.35; 
-                        if (currentX < -slideCompleteThreshold) { 
-                            this.showRecords(medication.id);
-                        } else { 
-                            this.isScreenTransitioning = true; 
-                            this.dom.mainScreen.style.transition = 'transform var(--transition-duration) var(--transition-timing-function)';
-                            this.dom.recordsScreen.style.transition = 'transform var(--transition-duration) var(--transition-timing-function)';
-                            
-                            this.dom.mainScreen.style.transform = 'translateX(0px)';
-                            this.dom.recordsScreen.style.transform = 'translateX(100%)';
-
-                            const onSnapBackEnd = () => {
-                                this.dom.recordsScreen.removeEventListener('transitionend', onSnapBackEnd);
-                                this.dom.mainScreen.style.transition = ''; 
-                                this.dom.recordsScreen.style.transition = '';
-                                this.isScreenTransitioning = false;
-                            };
-                            this.dom.recordsScreen.addEventListener('transitionend', onSnapBackEnd, { once: true });
-                        }
-                    } else if (isItemDragMode) { 
-                        medicationContentWrapper.style.transform = ''; 
-                        if (currentX > itemActionThreshold) { 
-                            setTimeout(() => this.consumeMedication(medication.id), 0); 
-                        }
-                    } else {
-                        medicationContentWrapper.style.transform = ''; 
-                    }
-                    
-                    isItemDragMode = false; 
-                    isScreenSlideMode = false;
-                };
-                
-                const passiveFalse = { passive: false };
-                element.addEventListener('touchstart', onStart, passiveFalse);
-                element.addEventListener('touchmove', onMove, passiveFalse);
-                element.addEventListener('touchend', onEnd); 
-                element.addEventListener('touchcancel', onEnd); 
-                
-                element.addEventListener('mousedown', onStart); 
-                element.addEventListener('mouseup', (event) => onEnd(event)); 
-
+                    e.stopPropagation(); 
+                    this.showActionChoiceModal(medication);
+                });
             }
 
+
             renderMedications() {
-                if (this.activeItemGestures.size > 0 || this.isScreenTransitioning) return;
+                if (this.isScreenTransitioning) return; 
                 const container = this.dom.medicationsList;
                 if (this.medications.length === 0) {
                     container.innerHTML = `<div class="empty-records"><p>No medications added yet.</p><p style="font-size: 14px; margin-top: 8px;">Tap an action below to start.</p></div>`;
@@ -1396,9 +1422,6 @@
                     }
                     return `
                         <div class="medication-item" data-id="${med.id}" style="background: ${this.getCardColor(med)};">
-                            <div class="medication-swipe-actions">
-                                <div class="swipe-action-text">Log Dose</div>
-                            </div>
                             <div class="medication-content-wrapper">
                                 <div class="medication-content">
                                     <div class="medication-name">${med.name}</div>
@@ -1410,7 +1433,7 @@
                 }).join('');
                 container.querySelectorAll('.medication-item').forEach(item => {
                     const med = this.medications.find(m => m.id === item.dataset.id);
-                    if (med) this.setupItemSwipeGestures(item, med);
+                    if (med) this.setupItemSwipeGestures(item, med); 
                 });
             }
             
@@ -1427,7 +1450,6 @@
                         return;
                     }
                     this.updateRecordsDisplay();
-                    this.updateUndoRedoButtons();
                 }
             }
 
