@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Medication Tracker</title>
+    <meta name="description" content="A simple app to track your medication intake and history.">
     <meta name="theme-color" content="#92A3A7">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Medication%20Tracker%22%2C%22short_name%22%3A%22MedTracker%22%2C%22description%22%3A%22A%20simple%20app%20to%20track%20your%20medication%20intake%20and%20history.%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23FFFFFF%22%2C%22theme_color%22%3A%22%2392A3A7%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage/svg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%3D%27http%3A//www.w3.org/2000/svg%27%2520width%3D%27192%27%2520height%3D%27192%27%2520viewBox%3D%270%25200%2520192%2520192%27%253E%253Crect%2520width%3D%27192%27%2520height%3D%27192%27%2520fill%3D%27%2523FFFFFF%27/%253E%253Cpath%2520d%3D%27M86%252032h20v54h54v20h-54v54h-20v-54h-54v-20h54z%27%2520fill%3D%27%252392A3A7%27/%253E%253C/svg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image/svg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22data%3Aimage/svg%2Bxml%3Bcharset%3DUTF-8%2C%253Csvg%2520xmlns%3D%27http%3A//www.w3.org/2000/svg%27%2520width%3D%27512%27%2520height%3D%27512%27%2520viewBox%3D%270%25200%2520512%2520512%27%253E%253Crect%2520width%3D%27512%27%2520height%3D%27512%27%2520fill%3D%27%2523FFFFFF%27/%253E%253Cpath%2520d%3D%27M224%252096h64v128h128v64h-128v128h-64v-128h-128v-64h128z%27%2520fill%3D%27%252392A3A7%27/%253E%253C/svg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image/svg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%5D%7D">
     <style>
         :root {
             --primary-bg: white;
@@ -183,20 +185,20 @@
         }
         
         .footer-actions {
-            display: flex; /* Changed to flex for row layout */
-            align-items: stretch; /* Make buttons same height */
+            display: flex; 
+            align-items: stretch; 
             border-top: 1px solid var(--border-color-light);
         }
 
         .more-options-wrapper {
-            position: relative; /* For positioning the menu */
+            position: relative; 
         }
 
-        .action-button { /* Base style for footer buttons */
+        .action-button { 
             background: none;
             color: var(--accent-color);
             border: none;
-            padding: 18px; /* Consistent padding */
+            padding: 18px; 
             font-size: 16px;
             font-weight: var(--base-font-weight);
             cursor: pointer;
@@ -211,30 +213,30 @@
         }
 
         .more-options-trigger {
-            border-right: 1px solid var(--border-color-light); /* Visual separator */
-            padding: 18px 20px; /* Adjust padding for icon */
+            border-right: 1px solid var(--border-color-light); 
+            padding: 18px 20px; 
         }
         .more-options-trigger svg {
-            display: block; /* Helps with alignment */
+            display: block; 
         }
 
         .add-medication-footer-btn {
-            flex-grow: 1; /* Takes remaining space */
+            flex-grow: 1; 
             gap: 8px;
         }
         
         .options-menu {
             position: absolute;
-            bottom: calc(100% + 5px); /* Position above the trigger button */
+            bottom: calc(100% + 5px); 
             left: 0;
             background-color: var(--primary-bg);
             border: 1px solid var(--border-color-light);
             border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            z-index: 20; /* Ensure it's above other footer items */
-            display: none; /* Hidden by default */
-            width: max-content; /* Adjust width to content */
-            min-width: 180px; /* Minimum width */
+            z-index: 20; 
+            display: none; 
+            width: max-content; 
+            min-width: 180px; 
         }
         .options-menu.active {
             display: block;
@@ -512,10 +514,10 @@
                 <div class="footer-actions">
                     <div class="more-options-wrapper">
                         <button class="action-button more-options-trigger" id="moreOptionsTriggerBtn" aria-label="More options">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="1"></circle>
-                                <circle cx="12" cy="5" r="1"></circle>
-                                <circle cx="12" cy="19" r="1"></circle>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="5.5" r="1.5"></circle>
+                                <circle cx="12" cy="12" r="1.5"></circle>
+                                <circle cx="12" cy="18.5" r="1.5"></circle>
                             </svg>
                         </button>
                         <div class="options-menu" id="optionsMenu">
@@ -593,7 +595,6 @@
                     undoBtn: document.getElementById('undoBtn'),
                     redoBtn: document.getElementById('redoBtn'),
                     toast: document.getElementById('toast'),
-                    // New DOM elements for footer actions
                     addMedicationFooterBtn: document.getElementById('addMedicationFooterBtn'),
                     moreOptionsTriggerBtn: document.getElementById('moreOptionsTriggerBtn'),
                     optionsMenu: document.getElementById('optionsMenu'),
@@ -636,29 +637,31 @@
                     if (e.target === this.dom.addModal) this.hideAddModal();
                 });
 
-                // Footer action buttons
                 this.dom.addMedicationFooterBtn.addEventListener('click', () => this.showAddModal());
                 this.dom.moreOptionsTriggerBtn.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent click from closing menu immediately if we add a document click listener
+                    e.stopPropagation(); 
                     this.toggleOptionsMenu();
                 });
                 this.dom.exportDataMenuBtn.addEventListener('click', () => {
                     this.exportData();
-                    this.toggleOptionsMenu(false); // Close menu after action
+                    this.toggleOptionsMenu(false); 
                 });
                 this.dom.importDataMenuBtn.addEventListener('click', () => {
-                    this.dom.importFileInput.click();
-                    this.toggleOptionsMenu(false); // Close menu
+                    this.dom.importFileInput.click(); // This will trigger the 'change' event below
+                    // Menu will be closed by the document click listener if successful,
+                    // or can be forced closed here too.
                 });
                 
-                this.dom.importFileInput.addEventListener('change', (event) => this.importData(event));
+                this.dom.importFileInput.addEventListener('change', (event) => {
+                    this.importData(event);
+                    this.toggleOptionsMenu(false); // Close menu after file selection attempt
+                });
 
-                // Optional: Close menu when clicking outside
                 document.addEventListener('click', (event) => {
                     if (this.dom.optionsMenu.classList.contains('active') && 
                         !this.dom.optionsMenu.contains(event.target) && 
-                        event.target !== this.dom.moreOptionsTriggerBtn &&
-                        !this.dom.moreOptionsTriggerBtn.contains(event.target) // Check if click was on SVG inside button
+                        !this.dom.moreOptionsTriggerBtn.contains(event.target) &&
+                        event.target !== this.dom.moreOptionsTriggerBtn 
                         ) {
                         this.toggleOptionsMenu(false);
                     }
@@ -830,7 +833,7 @@
                 if (records.length === 0) {
                     this.dom.recordsContent.innerHTML = '<div class="empty-records">No records yet.</div>';
                 } else {
-                    const sortedRecords = [...records].sort((a, b) => a - b); // Oldest first
+                    const sortedRecords = [...records].sort((a, b) => a - b); 
                     this.dom.recordsContent.innerHTML = sortedRecords.map(timestamp => 
                         `<div class="record-item">${this.formatDateTime(timestamp)}</div>`
                     ).join('');
