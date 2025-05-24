@@ -1,7 +1,6 @@
 # Medication Tracker PWA
 
-<img width="758" alt="image" src="https://github.com/user-attachments/assets/1bc96bcb-0a31-4cf4-8e79-0bcd6c89f5fb" />
-
+<img width="970" alt="image" src="https://github.com/user-attachments/assets/cfc4ba22-b1bf-43f7-a92d-7247157d9666" />
 
 A simple, clean, and modern Progressive Web App (PWA) to help you track your medication intake, view your history, and manage your medication schedule effectively. All data is stored locally in your browser.
 
