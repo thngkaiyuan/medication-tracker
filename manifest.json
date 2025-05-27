@@ -1,0 +1,23 @@
+{
+  "name": "Medication Tracker",
+  "short_name": "MedTracker",
+  "description": "A simple app to track your medication intake and history.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#92A3A7",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20width%3D'192'%20height%3D'192'%20viewBox%3D'0%200%20192%20192'%3E%3Crect%20width%3D'192'%20height%3D'192'%20fill%3D'%23FFFFFF'/%3E%3Cpath%20d%3D'M86%2032h20v54h54v20h-54v54h-20v-54h-54v-20h54z'%20fill%3D'%2392A3A7'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20width%3D'512'%20height%3D'512'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20fill%3D'%23FFFFFF'/%3E%3Cpath%20d%3D'M224%2096h64v128h128v64h-128v128h-64v-128h-128v-64h128z'%20fill%3D'%2392A3A7'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
