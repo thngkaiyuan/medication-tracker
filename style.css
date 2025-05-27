@@ -1,0 +1,578 @@
+:root {
+            --primary-bg: white;
+            --text-color-main: #2F2F2F;
+            --text-color-header: #4A4A4A;
+            --text-color-subheader: #8A8A8A;
+            --text-color-light: #6A6A6A;
+            --text-color-medication-name: white;
+            --text-color-medication-status: rgba(255, 255, 255, 0.85);
+            --border-color-light: #EEEEEE;
+            --border-color-input: #E0E0E0;
+            --accent-color: #92A3A7;
+            --action-color-undo: #D32F2F;
+            --action-color-redo: #2196F3;
+            --action-color-delete: #D32F2F;
+            --disabled-color: #CCCCCC;
+            --modal-backdrop-color: rgba(0, 0, 0, 0.4);
+            --toast-bg: rgba(74, 74, 74, 0.9);
+
+            --font-family-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            --base-font-weight: 300;
+            --action-font-weight: 500;
+
+
+            --transition-duration: 0.3s;
+            --transition-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --transition-transform: transform var(--transition-duration) var(--transition-timing-function);
+
+            --safe-gradient-start: #2E7D32;
+            --safe-gradient-end: #4CAF50;
+            --recent-gradient-start: #E65100;
+            --recent-gradient-end: #FF9800;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-system);
+            background: var(--primary-bg);
+            color: var(--text-color-main);
+            line-height: 1.6;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            overflow-x: hidden;
+            font-weight: var(--base-font-weight);
+        }
+
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .main-screen, .records-screen {
+            width: 100%;
+            height: 100%;
+            background: var(--primary-bg);
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            transition: transform var(--transition-duration) var(--transition-timing-function);
+        }
+
+        .main-screen {
+            z-index: 5;
+            transform: translateX(0);
+        }
+
+        .main-screen.viewing-records {
+            transform: translateX(-100%);
+        }
+
+        .records-screen {
+            transform: translateX(100%);
+            z-index: 10;
+        }
+
+        .records-screen.active {
+            transform: translateX(0);
+        }
+
+        .container, .records-container {
+            width: 100%;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 20px 32px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-header);
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .medications-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+
+        .medication-item {
+            position: relative;
+            border-bottom: 1px solid var(--border-color-light);
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .medication-item:last-child {
+            border-bottom: none;
+        }
+
+        .medication-content-wrapper {
+            position: relative;
+            z-index: 2;
+            background: inherit;
+        }
+
+        .medication-content {
+            padding: 24px 20px;
+            text-align: center;
+        }
+
+        .medication-name {
+            font-size: 24px;
+            font-weight: var(--base-font-weight);
+            margin-bottom: 8px;
+            color: var(--text-color-medication-name);
+            letter-spacing: -0.4px;
+            text-transform: uppercase;
+        }
+
+        .medication-status {
+            font-size: 12px;
+            color: var(--text-color-medication-status);
+            font-weight: var(--base-font-weight);
+        }
+        .medication-last-consumed {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: var(--base-font-weight);
+            margin-top: 6px;
+        }
+
+        .footer-actions {
+            display: flex;
+            align-items: stretch;
+            border-top: 1px solid var(--border-color-light);
+        }
+
+        .more-options-wrapper {
+            position: relative;
+        }
+
+        .action-button {
+            background: none;
+            color: var(--accent-color);
+            border: none;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: var(--base-font-weight);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease, background-color 0.2s ease;
+            letter-spacing: -0.2px;
+        }
+        .action-button:active {
+            background: #F8F8F8;
+        }
+
+        .more-options-trigger {
+            border-right: 1px solid var(--border-color-light);
+            padding: 18px 20px;
+        }
+        .more-options-trigger svg {
+            display: block;
+            fill: currentColor;
+        }
+
+        .add-medication-footer-btn {
+            flex-grow: 1;
+            gap: 8px;
+        }
+
+        .options-menu {
+            position: absolute;
+            bottom: calc(100% + 5px);
+            left: 0;
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 20;
+            display: none;
+            width: max-content;
+            min-width: 180px;
+        }
+        .options-menu.active {
+            display: block;
+        }
+        .menu-button {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            border-bottom: 1px solid var(--border-color-light);
+            color: var(--text-color-header);
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .menu-button:last-child {
+            border-bottom: none;
+        }
+        .menu-button:hover {
+            background-color: #f9f9f9;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--modal-backdrop-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--primary-bg);
+            margin: 20px;
+            max-width: 400px;
+            width: calc(100% - 40px);
+            transform: scale(0.95);
+            transition: transform var(--transition-duration) ease;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-color-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            color: var(--text-color-header);
+            font-weight: var(--base-font-weight);
+            letter-spacing: -0.3px;
+            flex-grow: 1;
+            text-align: center;
+        }
+        .modal-header .delete-med-icon-btn,
+        .modal-header .record-entry-delete-btn {
+            flex-shrink: 0;
+        }
+        #actionChoiceModal .modal-header h2,
+        .modal-header h2:only-child {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            border-top: 1px solid var(--border-color-light);
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: var(--base-font-weight);
+            cursor: pointer;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            letter-spacing: -0.2px;
+        }
+
+        .modal-cancel-btn {
+            border-right: 1px solid var(--border-color-light);
+            color: var(--text-color-subheader);
+        }
+        .modal-cancel-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .modal-confirm-btn {
+            color: var(--accent-color);
+            font-weight: var(--action-font-weight);
+        }
+        .modal-confirm-btn:hover {
+            background: #e8f0f2;
+        }
+        .modal-confirm-btn.delete-confirm-style {
+            color: var(--action-color-delete);
+            font-weight: var(--action-font-weight);
+        }
+
+        /* Ensure Action Choice buttons have consistent (base) font weight */
+        #actionChoiceViewRecordsBtn,
+        #actionChoiceLogBtn {
+            font-weight: var(--base-font-weight);
+        }
+        /* Retain accent color for Log Dose button in Action Choice modal for primary action cue */
+         #actionChoiceLogBtn {
+            color: var(--accent-color);
+         }
+
+
+        #modalTitle {
+        }
+
+        .delete-med-icon-btn {
+            background: none;
+            border: none;
+            color: var(--action-color-delete);
+            cursor: pointer;
+            padding: 4px;
+            display: none;
+        }
+        .delete-med-icon-btn svg {
+            width: 20px;
+            height: 20px;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-light);
+            font-size: 14px;
+            letter-spacing: -0.1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 0;
+            border: none;
+            border-bottom: 1px solid var(--border-color-input);
+            font-size: 16px;
+            background: none;
+            transition: border-color 0.2s ease;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-header);
+        }
+        .form-group input[type="date"], .form-group input[type="time"] {
+            padding: 12px 10px;
+            border: 1px solid var(--border-color-input);
+            border-radius: 4px;
+        }
+
+
+        #deleteConfirmationText {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-color-light);
+            font-size: 15px;
+            display: none;
+        }
+        #recordEntryDeleteConfirmationText {
+             padding: 10px 24px 20px;
+             text-align: center;
+             color: var(--text-color-light);
+             font-size: 15px;
+             display: none;
+        }
+
+
+        #actionChoiceModal .modal-body {
+            display: none;
+        }
+        #actionChoiceModal .modal-header {
+            justify-content: center;
+            border-bottom: none;
+            padding-bottom: 20px;
+        }
+        #actionChoiceModal .modal-buttons {
+            border-top: 1px solid var(--border-color-light);
+        }
+
+
+        .records-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .records-title {
+            font-size: 22px;
+            font-weight: var(--base-font-weight);
+            color: var(--text-color-header);
+            letter-spacing: -0.3px;
+            text-transform: uppercase;
+            flex-grow: 1;
+            text-align: center;
+            margin: 0 5px;
+        }
+
+        .header-action-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            padding: 10px;
+            line-height: 0;
+            flex-shrink: 0;
+        }
+        .header-action-btn svg {
+            width: 24px;
+            height: 24px;
+            display: block;
+            stroke: currentColor;
+        }
+
+
+        .records-content {
+            flex: 1;
+            padding: 0 20px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            padding: 12px 0px;
+            font-size: 19px; /* Existing */
+            color: #000000; /* Existing */
+            font-weight: var(--base-font-weight); /* Existing */
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color-light); /* Existing */
+        }
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-number {
+            min-width: 30px; /* Adjust as needed */
+            text-align: right;
+            margin-right: 12px; /* Spacing between number and date */
+        }
+
+        .record-datetime {
+            flex-grow: 1; /* Takes up available space */
+        }
+
+        .record-entry-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-color-light);
+            cursor: pointer;
+            padding: 8px;
+            margin-left: 10px; /* Spacing from the date/time */
+        }
+        .record-entry-action-btn svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+            fill: currentColor;
+        }
+
+        .empty-records {
+            text-align: center;
+            color: #9A9A9A;
+            font-size: 16px;
+            margin-top: 80px;
+            font-weight: var(--base-font-weight);
+            padding: 0 20px;
+        }
+
+        .records-footer-action {
+            border-top: 1px solid var(--border-color-light);
+        }
+        #addManualRecordBtn {
+            width: 100%;
+            padding: 18px 0;
+            font-size: 16px;
+            font-weight: var(--base-font-weight);
+            color: var(--accent-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background-color 0.2s ease;
+            letter-spacing: -0.2px;
+        }
+        #addManualRecordBtn:active {
+            background: #F8F8F8;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--toast-bg);
+            color: white;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 300;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-duration) ease, visibility var(--transition-duration) ease, transform var(--transition-duration) var(--transition-timing-function);
+            backdrop-filter: blur(10px);
+            letter-spacing: -0.1px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .header { padding: 16px 16px 24px; }
+            .records-header { padding: 16px; }
+            .records-content { padding: 0 16px; }
+            .medications-list { padding-bottom: 16px; }
+
+            .header h1 { font-size: 24px; }
+            .medication-content { padding: 20px 16px; }
+            .modal-content { margin: 16px; width: calc(100% - 32px); }
+            .record-number { min-width: 25px; margin-right: 8px;}
+        }
