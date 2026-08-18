@@ -8,7 +8,7 @@ The app is implemented natively in SwiftUI for iPhone and iPad. Medication data 
 - PWA-compatible JSON import/export through the native document picker and share sheet.
 - Local persistence in Application Support and a privacy manifest declaring no collected data.
 - Automated unit, lifecycle, persistence, export, large-text, accessibility, Dark Mode, and portrait/landscape coverage on iPhone and iPad.
-- Release static analysis, signed archive validation, and an App Store upload preflight.
+- Release static analysis, signed archive validation, and a successful App Store Connect upload of version 1.0 build 1.
 - Privacy-safe screenshots under `app-store/screenshots`; all names and records are generated samples.
 
 ## Human prerequisites
@@ -27,7 +27,9 @@ This project is already built with Xcode 26 and the iOS 26 SDK, satisfying Apple
 - The support URL is public and returns HTTP 200.
 - The privacy policy exists at `public/privacy.html`, is included in the production build, and is ready for GitHub Pages. The proposed public URL still returns HTTP 404 because `codex/ios-app` has not been merged into and deployed from `main`. After explicit merge approval, enable GitHub Pages with **GitHub Actions** as its source if needed and verify the URL returns HTTP 200 before submission.
 - The paid Apple Developer Program membership is active. Xcode recognizes team `J3U6VV2679` as an App Store Connect team and has registered `com.kaiyuan.medicationtracker`.
-- App Store upload preflight currently stops only because the App Store Connect app record has not yet been created. Create the iOS record with name `MedTracker`, bundle ID `com.kaiyuan.medicationtracker`, and SKU `medtracker-ios-001`, then repeat the archive export/upload.
+- App Store Connect record `6802761446` exists as `MedTracker: Private Dose Log`, and version 1.0 build 1 has been uploaded for processing.
+- The account holder must accept Apple's updated Developer Program License Agreement before submission.
+- Before submission, install and test the exact release candidate on the owner's physical iPhone. Freeze and submit only after the owner explicitly approves that build.
 
 ## Build and device verification
 
@@ -43,7 +45,7 @@ In Xcode:
 
 ## App Store Connect values
 
-- Name: `MedTracker` (subject to availability)
+- Name: `MedTracker: Private Dose Log`
 - Subtitle: `Private medication dose log`
 - Primary category: `Health & Fitness`
 - Secondary category: `Medical`
@@ -78,18 +80,20 @@ Review notes:
 ## Archive and submit
 
 1. In Certificates, Identifiers & Profiles, register the exact bundle ID if automatic signing has not already done so.
-2. In App Store Connect, create the app record using the exact bundle ID and SKU.
+2. In App Store Connect, use app record `6802761446`, which is tied to the exact bundle ID and SKU.
 3. Upload the prepared screenshots. Apple currently accepts the generated 6.9-inch iPhone size (1320×2868) and 13-inch iPad size (2064×2752). Keep screenshots opaque and do not add real medication data.
 4. In Xcode select **Any iOS Device (arm64)**, then **Product → Archive**.
 5. In Organizer choose **Distribute App → App Store Connect → Upload**.
-6. Attach the uploaded build in App Store Connect, complete app privacy, age rating, content rights, encryption, medical-device, and review-contact questions, then submit for review.
+6. Attach the uploaded build in App Store Connect and complete app privacy, age rating, content rights, encryption, medical-device, and review-contact questions.
+7. Install and test the exact release candidate on the owner's physical iPhone, record the approved commit/build, and make no further release changes without repeating that test.
+8. Only after the owner explicitly approves the frozen build, submit it for review.
 
 ## Exact handoff when the owner returns
 
-1. Confirm the paid Apple Developer Program membership is active and tell Codex which Team appears in Xcode.
-2. Confirm the individual team shown by Apple and whether App Store Connect accepts the requested `2026 Positive` copyright string.
-3. Stay available briefly for Apple ID two-factor authentication and any agreement acceptance.
-4. Codex can then guide or complete the signing/archive/upload flow up to any Apple confirmation that must be performed by the account holder.
+1. Accept the updated Apple Developer Program License Agreement as the Account Holder.
+2. Authorize the `codex/ios-app` merge into `main` when ready so the privacy-policy URL can be deployed and verified.
+3. Perform final physical-iPhone testing of the exact release candidate and explicitly approve or reject it.
+4. Stay available briefly for any Apple ID confirmation that appears during final submission.
 
 Apple review, approval, and the public release are external steps. Do not announce the app as available until App Store Connect shows the intended version as Ready for Distribution.
 
