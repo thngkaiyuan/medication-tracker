@@ -62,7 +62,7 @@ In Xcode:
 - Availability: confirm the desired countries/regions
 - Age rating: complete Apple's current questionnaire accurately; the app contains no objectionable content, user-generated content, or unrestricted web access.
 - Medical declaration: this is a personal record-keeping tool, not a regulated medical device, and it does not diagnose, prescribe, calculate a dose, or provide medical advice.
-- Content rights: the submitter owns or has permission to use all included content.
+- Content rights: `No, this app does not contain, show, or access third-party content.`
 - EU DSA: declare the account's trader/non-trader status in App Store Connect; this is an account/legal choice and cannot be inferred from the code.
 
 Suggested description:
