@@ -423,6 +423,13 @@
             padding: 12px 14px;
         }
 
+        .form-disclaimer {
+            margin: 4px 0 0;
+            color: var(--text-color-light);
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
 
         #deleteConfirmationText {
             padding: 20px;

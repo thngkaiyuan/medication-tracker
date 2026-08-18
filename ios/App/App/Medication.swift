@@ -56,7 +56,10 @@ struct Medication: Identifiable, Codable, Equatable, Hashable {
     guard timeBetweenHours.isFinite, (1...48).contains(timeBetweenHours) else {
       throw MedicationValidationError.invalidDoseInterval
     }
-    guard maxDosesPerDay.isFinite, (0...24).contains(maxDosesPerDay) else {
+    guard maxDosesPerDay.isFinite,
+      maxDosesPerDay.rounded(.towardZero) == maxDosesPerDay,
+      (0...24).contains(maxDosesPerDay)
+    else {
       throw MedicationValidationError.invalidDailyLimit
     }
     guard records.allSatisfy(\.isFinite) else {
@@ -73,8 +76,20 @@ struct Medication: Identifiable, Codable, Equatable, Hashable {
   }
 
   func nextDoseDate(after date: Date = .now) -> Date? {
-    guard let lastDoseDate else { return nil }
-    return lastDoseDate.addingTimeInterval(timeBetweenHours * 3_600)
+    var nextDates: [Date] = []
+
+    if let lastDoseDate {
+      nextDates.append(lastDoseDate.addingTimeInterval(timeBetweenHours * 3_600))
+    }
+
+    let recentDoses = doseDatesInLast24Hours(at: date)
+    let dailyLimit = Int(maxDosesPerDay)
+    if dailyLimit > 0, recentDoses.count >= dailyLimit {
+      let doseThatClearsLimit = recentDoses[recentDoses.count - dailyLimit]
+      nextDates.append(doseThatClearsLimit.addingTimeInterval(24 * 3_600))
+    }
+
+    return nextDates.max()
   }
 
   func timeUntilNextDose(at date: Date = .now) -> TimeInterval {
@@ -87,17 +102,28 @@ struct Medication: Identifiable, Codable, Equatable, Hashable {
   }
 
   func progress(at date: Date = .now) -> Double {
-    guard let lastDoseDate else { return 1 }
-    let interval = timeBetweenHours * 3_600
-    guard interval > 0 else { return 1 }
-    return min(1, max(0, date.timeIntervalSince(lastDoseDate) / interval))
+    guard let nextDoseDate = nextDoseDate(after: date),
+      nextDoseDate > date,
+      let lastDoseDate
+    else {
+      return 1
+    }
+
+    let totalWait = nextDoseDate.timeIntervalSince(lastDoseDate)
+    guard totalWait > 0 else { return 1 }
+    return min(1, max(0, date.timeIntervalSince(lastDoseDate) / totalWait))
   }
 
-  func dosesToday(at date: Date = .now, calendar: Calendar = .current) -> Int {
-    records.lazy
+  func dosesInLast24Hours(at date: Date = .now) -> Int {
+    doseDatesInLast24Hours(at: date).count
+  }
+
+  private func doseDatesInLast24Hours(at date: Date) -> [Date] {
+    let cutoff = date.addingTimeInterval(-24 * 3_600)
+    return records.lazy
       .map { Date(timeIntervalSince1970: $0 / 1_000) }
-      .filter { calendar.isDate($0, inSameDayAs: date) }
-      .count
+      .filter { $0 > cutoff && $0 <= date }
+      .sorted()
   }
 }
 

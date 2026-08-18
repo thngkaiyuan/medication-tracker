@@ -64,7 +64,7 @@ In Xcode:
 
 Suggested description:
 
-> MedTracker is a simple, private way to record medication doses and see when the next dose is due. Add medications with custom intervals and optional daily limits, log doses in a tap, review and edit history, and create portable JSON backups. Your medication data stays on your device, and the complete app works without an internet connection.
+> MedTracker is a simple, private way to record medication doses and see at a glance when the waiting limits you entered have cleared. Set a minimum interval and optional rolling 24-hour limit, log doses in a tap, follow the color-coded wait, review and edit history, and create portable JSON backups. Colors reflect only your entries and do not determine whether a dose is medically safe. Your medication data stays on your device, and the complete app works without an internet connection.
 
 Suggested keywords:
 

@@ -246,7 +246,7 @@ final class AppUITests: XCTestCase {
     XCTAssertTrue(app.buttons["Cancel"].isHittable)
     XCTAssertTrue(app.staticTexts["Set a daily dose limit"].exists)
     let disclaimer = app.staticTexts.matching(
-      NSPredicate(format: "label BEGINSWITH %@", "MedTracker records your schedule")
+      NSPredicate(format: "label BEGINSWITH %@", "Colors reflect only the minimum interval")
     ).firstMatch
     XCTAssertTrue(disclaimer.exists)
     attachScreenshot(named: "accessibility-text-medication-form")

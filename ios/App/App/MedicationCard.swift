@@ -7,7 +7,9 @@ struct MedicationCard: View {
 
   private var statusText: String {
     let remaining = medication.timeUntilNextDose(at: now)
-    return remaining == 0 ? "Ready to take" : "Next dose in \(remaining.conciseDuration)"
+    return remaining == 0
+      ? "Entered wait limits cleared"
+      : "Wait limits clear in \(remaining.conciseDuration)"
   }
 
   private var lastDoseText: String {
@@ -46,6 +48,7 @@ struct MedicationCard: View {
     }
     .buttonStyle(.plain)
     .accessibilityLabel("\(medication.name). \(statusText). \(lastDoseText)")
-    .accessibilityHint("Shows actions for this medication")
+    .accessibilityHint(
+      "Reflects only your entered interval and rolling 24-hour limit. Shows actions for this medication")
   }
 }

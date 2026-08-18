@@ -66,4 +66,55 @@ final class MedicationTests: XCTestCase {
             .utf8))
     )
   }
+
+  func testReadinessWaitsForBothIntervalAndRolling24HourLimit() throws {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+    let now = try XCTUnwrap(
+      calendar.date(from: DateComponents(year: 2026, month: 8, day: 18, hour: 12)))
+    let firstDose = try XCTUnwrap(
+      calendar.date(from: DateComponents(year: 2026, month: 8, day: 18, hour: 8)))
+    let secondDose = try XCTUnwrap(
+      calendar.date(from: DateComponents(year: 2026, month: 8, day: 18, hour: 10)))
+    let firstDoseClears = firstDose.addingTimeInterval(24 * 3_600)
+    let medication = Medication(
+      name: "Example",
+      timeBetweenHours: 1,
+      maxDosesPerDay: 2,
+      records: [
+        firstDose.timeIntervalSince1970 * 1_000,
+        secondDose.timeIntervalSince1970 * 1_000,
+      ]
+    )
+
+    XCTAssertFalse(medication.isReady(at: now))
+    XCTAssertEqual(medication.nextDoseDate(after: now), firstDoseClears)
+    XCTAssertEqual(
+      medication.timeUntilNextDose(at: now),
+      20 * 3_600,
+      accuracy: 0.001
+    )
+  }
+
+  func testFutureRecordsDoNotCountTowardRolling24HourLimit() throws {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = try XCTUnwrap(TimeZone(secondsFromGMT: 0))
+    let now = try XCTUnwrap(
+      calendar.date(from: DateComponents(year: 2026, month: 8, day: 18, hour: 12)))
+    let earlierDose = try XCTUnwrap(
+      calendar.date(from: DateComponents(year: 2026, month: 8, day: 18, hour: 8)))
+    let futureRecord = try XCTUnwrap(
+      calendar.date(from: DateComponents(year: 2026, month: 8, day: 18, hour: 18)))
+    let medication = Medication(
+      name: "Example",
+      timeBetweenHours: 1,
+      maxDosesPerDay: 2,
+      records: [
+        earlierDose.timeIntervalSince1970 * 1_000,
+        futureRecord.timeIntervalSince1970 * 1_000,
+      ]
+    )
+
+    XCTAssertEqual(medication.dosesInLast24Hours(at: now), 1)
+  }
 }

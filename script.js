@@ -1,4 +1,4 @@
-import { parseMedicationBackup } from './data.js';
+import { getMedicationTiming, parseMedicationBackup } from './data.js';
 
 class MedicationTracker {
             constructor() {
@@ -674,15 +674,15 @@ class MedicationTracker {
                 if (!med.records || med.records.length === 0) return Infinity;
                 return Date.now() - Math.max(...med.records);
             }
-            getTimeUntilNextDose(med) { const ts = this.getTimeSinceLastDose(med); return Math.max(0, med.timeBetweenHours * 3600000 - ts); }
-            isSafeToConsume(med) { return this.getTimeUntilNextDose(med) === 0; }
-            getProgressRatio(med) { const ts = this.getTimeSinceLastDose(med); return ts === Infinity ? 0 : Math.min(1, ts / (med.timeBetweenHours * 3600000)); }
+            getTimeUntilNextDose(med) { return getMedicationTiming(med).remainingMilliseconds; }
+            isSafeToConsume(med) { return getMedicationTiming(med).ready; }
+            getProgressRatio(med) { return getMedicationTiming(med).progress; }
 
-            getCardColor(medication) {
-                if (this.isSafeToConsume(medication)) {
+            getCardColor(medication, timing = getMedicationTiming(medication)) {
+                if (timing.ready) {
                     return `linear-gradient(135deg, var(--safe-gradient-start) 0%, var(--safe-gradient-end) 100%)`;
                 }
-                const progress = this.getProgressRatio(medication);
+                const progress = timing.progress;
                 const rO = 230, gO = 81, bO = 0;   // Orange
                 const rG = 46, gG = 125, bG = 50;  // Green
                 const r = Math.round(rO + (rG - rO) * progress);
@@ -737,7 +737,10 @@ class MedicationTracker {
                     return;
                 }
                 const medicationElements = this.medications.map(med => {
-                    const statusText = this.isSafeToConsume(med) ? 'Safe to take now' : `Next dose in: ${this.formatDuration(this.getTimeUntilNextDose(med))}`;
+                    const timing = getMedicationTiming(med);
+                    const statusText = timing.ready
+                        ? 'Entered wait limits cleared'
+                        : `Wait limits clear in: ${this.formatDuration(timing.remainingMilliseconds)}`;
                     let lastConsumedText = 'Last: Never';
                     if (med.records && med.records.length > 0) {
                         const lastRecordTimestamp = Math.max(...med.records);
@@ -746,7 +749,7 @@ class MedicationTracker {
                     const item = document.createElement('div');
                     item.className = 'medication-item';
                     item.dataset.id = med.id;
-                    item.style.background = this.getCardColor(med);
+                    item.style.background = this.getCardColor(med, timing);
                     item.tabIndex = 0;
                     item.setAttribute('role', 'button');
                     item.setAttribute('aria-label', `${med.name}. ${statusText}. ${lastConsumedText}`);

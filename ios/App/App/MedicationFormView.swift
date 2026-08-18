@@ -42,7 +42,7 @@ struct MedicationFormView: View {
 
           Section {
             Stepper(value: $hoursBetweenDoses, in: 1...48) {
-              LabeledContent("Hours between doses", value: "\(hoursBetweenDoses)")
+              LabeledContent("Minimum hours between doses", value: "\(hoursBetweenDoses)")
             }
 
             Toggle(isOn: $usesDailyLimit.animation()) {
@@ -52,14 +52,14 @@ struct MedicationFormView: View {
 
             if usesDailyLimit {
               Stepper(value: $dailyLimit, in: 1...24) {
-                LabeledContent("Maximum per day", value: "\(dailyLimit)")
+                LabeledContent("Maximum in any 24 hours", value: "\(dailyLimit)")
               }
             }
           } header: {
             sectionHeader("Schedule")
           } footer: {
             Text(
-              "MedTracker records your schedule but does not recommend or enforce a dosage. Follow your clinician’s or pharmacist’s instructions."
+              "Colors reflect only the minimum interval and rolling 24-hour limit you enter. They do not determine whether a dose is medically safe. Follow the medication label and your clinician’s or pharmacist’s instructions."
             )
             .font(.footnote)
             .foregroundStyle(AppTheme.mutedText)

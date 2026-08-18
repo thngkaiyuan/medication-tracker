@@ -50,6 +50,15 @@ struct AboutView: View {
 
           Section {
             Text(
+              "A tile’s color progresses as its waiting period elapses. The wait clears only after both the minimum hours since the latest logged dose and the optional maximum you entered for any rolling 24-hour period. This calculation uses only your entries and does not determine whether another dose is medically safe."
+            )
+            .fixedSize(horizontal: false, vertical: true)
+          } header: {
+            sectionHeader("How colors work")
+          }
+
+          Section {
+            Text(
               "MedTracker is a personal record-keeping tool, not a medical device and not a substitute for professional medical advice. Follow the instructions of your clinician and pharmacist."
             )
             .fixedSize(horizontal: false, vertical: true)

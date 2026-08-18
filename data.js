@@ -17,7 +17,7 @@ export function parseMedicationBackup(value) {
         if (!Number.isFinite(timeBetweenHours) || timeBetweenHours < 1 || timeBetweenHours > 48) {
             throw new Error(`Medication ${position} has invalid hours between doses.`);
         }
-        if (!Number.isFinite(maxDosesPerDay) || maxDosesPerDay < 0 || maxDosesPerDay > 24) {
+        if (!Number.isInteger(maxDosesPerDay) || maxDosesPerDay < 0 || maxDosesPerDay > 24) {
             throw new Error(`Medication ${position} has an invalid daily dose limit.`);
         }
         if (!Array.isArray(medication.records) || medication.records.some((record) => !Number.isFinite(record))) {
@@ -32,4 +32,40 @@ export function parseMedicationBackup(value) {
             records: [...medication.records]
         };
     });
+}
+
+export function getMedicationTiming(medication, now = Date.now()) {
+    const records = Array.isArray(medication.records)
+        ? medication.records.filter(Number.isFinite)
+        : [];
+    const lastDose = records.length > 0 ? Math.max(...records) : null;
+    const intervalEnd = lastDose === null
+        ? now
+        : lastDose + (Number(medication.timeBetweenHours) * 3_600_000);
+
+    const dailyLimit = Number(medication.maxDosesPerDay) || 0;
+    const rollingDayStart = now - (24 * 3_600_000);
+    const dosesInLast24Hours = records
+        .filter((timestamp) => timestamp > rollingDayStart && timestamp <= now)
+        .sort((left, right) => left - right);
+    const dailyLimitReached = dailyLimit > 0 && dosesInLast24Hours.length >= dailyLimit;
+    const dailyLimitEnd = dailyLimitReached
+        ? dosesInLast24Hours[dosesInLast24Hours.length - dailyLimit] + (24 * 3_600_000)
+        : now;
+    const waitEnd = Math.max(intervalEnd, dailyLimitEnd);
+    const remainingMilliseconds = Math.max(0, waitEnd - now);
+
+    let progress = 1;
+    if (remainingMilliseconds > 0 && lastDose !== null && waitEnd > lastDose) {
+        progress = Math.min(1, Math.max(0, (now - lastDose) / (waitEnd - lastDose)));
+    }
+
+    return {
+        dailyLimitReached,
+        dosesInLast24Hours: dosesInLast24Hours.length,
+        progress,
+        ready: remainingMilliseconds === 0,
+        remainingMilliseconds,
+        waitEnd
+    };
 }
