@@ -3,6 +3,7 @@ import SwiftUI
 struct MedicationFormView: View {
   @EnvironmentObject private var store: MedicationStore
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   let medication: Medication?
   let onDelete: (() -> Void)?
@@ -30,9 +31,10 @@ struct MedicationFormView: View {
 
         Form {
           Section {
-            TextField("Medication Name", text: $name)
+            TextField("Medication Name", text: $name, axis: .vertical)
               .textInputAutocapitalization(.words)
               .submitLabel(.done)
+              .lineLimit(1...2)
               .accessibilityIdentifier("Medication Name")
           } header: {
             sectionHeader("Medication")
@@ -43,7 +45,10 @@ struct MedicationFormView: View {
               LabeledContent("Hours between doses", value: "\(hoursBetweenDoses)")
             }
 
-            Toggle("Set a daily dose limit", isOn: $usesDailyLimit.animation())
+            Toggle(isOn: $usesDailyLimit.animation()) {
+              Text("Set a daily dose limit")
+                .fixedSize(horizontal: false, vertical: true)
+            }
 
             if usesDailyLimit {
               Stepper(value: $dailyLimit, in: 1...24) {
@@ -56,6 +61,9 @@ struct MedicationFormView: View {
             Text(
               "MedTracker records your schedule but does not recommend or enforce a dosage. Follow your clinician’s or pharmacist’s instructions."
             )
+            .font(.footnote)
+            .foregroundStyle(AppTheme.mutedText)
+            .fixedSize(horizontal: false, vertical: true)
           }
 
           if medication != nil {
@@ -67,13 +75,12 @@ struct MedicationFormView: View {
             }
           }
         }
-        .font(.system(size: 16, weight: .light))
         .scrollContentBackground(.hidden)
         .background(Color(uiColor: .systemGroupedBackground))
       }
       .toolbar(.hidden, for: .navigationBar)
     }
-    .presentationDetents([.medium, .large])
+    .presentationDetents(dynamicTypeSize.isAccessibilitySize ? [.large] : [.medium, .large])
     .interactiveDismissDisabled(false)
     .alert(
       "Delete \(medication?.name ?? "this medication")?", isPresented: $showingDeleteConfirmation
@@ -94,32 +101,55 @@ struct MedicationFormView: View {
 
   private func sectionHeader(_ title: String) -> some View {
     Text(title)
-      .font(.system(size: 13, weight: .light))
-      .foregroundStyle(Color(uiColor: .systemGray))
+      .font(.subheadline)
+      .foregroundStyle(.primary)
   }
 
   private var formHeader: some View {
-    ZStack {
-      Text(medication == nil ? "Add Medication" : "Edit Medication")
-        .font(.system(size: 19, weight: .light))
-        .foregroundStyle(AppTheme.header)
-
-      HStack {
-        Button("Cancel") { dismiss() }
-          .frame(width: 72, height: 44, alignment: .leading)
-
-        Spacer()
-
-        Button("Save") { save() }
-          .frame(width: 72, height: 44, alignment: .trailing)
-          .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-          .accessibilityIdentifier(medication == nil ? "Add" : "Save Changes")
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 0) {
+          formHeaderTitle
+          formHeaderActions
+        }
+      } else {
+        ZStack {
+          formHeaderTitle
+          formHeaderActions
+        }
       }
     }
-    .font(.system(size: 16, weight: .light))
-    .foregroundStyle(AppTheme.tint)
     .padding(.horizontal, 16)
     .padding(.vertical, 4)
+  }
+
+  private var formHeaderTitle: some View {
+    Text(medication == nil ? "Add Medication" : "Edit Medication")
+      .font(.system(.title3, design: .default, weight: .light))
+      .foregroundStyle(AppTheme.header)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
+  private var formHeaderActions: some View {
+    HStack {
+      Button { dismiss() } label: {
+        Text("Cancel")
+          .frame(minWidth: 72, minHeight: 44, alignment: .leading)
+          .contentShape(Rectangle())
+      }
+
+      Spacer()
+
+      Button { save() } label: {
+        Text("Save")
+          .frame(minWidth: 72, minHeight: 44, alignment: .trailing)
+          .contentShape(Rectangle())
+      }
+      .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+      .accessibilityIdentifier(medication == nil ? "Add" : "Save Changes")
+    }
+    .font(.system(.body, design: .default, weight: .light))
+    .foregroundStyle(AppTheme.control)
   }
 
   private func save() {

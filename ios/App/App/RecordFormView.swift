@@ -3,6 +3,7 @@ import SwiftUI
 struct RecordFormView: View {
   @EnvironmentObject private var store: MedicationStore
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   let medicationID: String
   let originalTimestamp: Double?
@@ -34,8 +35,8 @@ struct RecordFormView: View {
             .datePickerStyle(.graphical)
           } header: {
             Text("Dose time")
-              .font(.system(size: 13, weight: .light))
-              .foregroundStyle(Color(uiColor: .systemGray))
+              .font(.system(.caption, design: .default, weight: .light))
+              .foregroundStyle(AppTheme.mutedText)
           }
 
           if originalTimestamp != nil {
@@ -47,7 +48,6 @@ struct RecordFormView: View {
             }
           }
         }
-        .font(.system(size: 16, weight: .light))
         .scrollContentBackground(.hidden)
         .background(Color(uiColor: .systemGroupedBackground))
       }
@@ -68,26 +68,49 @@ struct RecordFormView: View {
   }
 
   private var formHeader: some View {
-    ZStack {
-      Text(originalTimestamp == nil ? "Add Manual Record" : "Edit Record Entry")
-        .font(.system(size: 19, weight: .light))
-        .foregroundStyle(AppTheme.header)
-
-      HStack {
-        Button("Cancel") { dismiss() }
-          .frame(width: 72, height: 44, alignment: .leading)
-
-        Spacer()
-
-        Button("Save") { save() }
-          .frame(width: 72, height: 44, alignment: .trailing)
-          .accessibilityIdentifier(originalTimestamp == nil ? "Add Record" : "Save Changes")
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 0) {
+          formHeaderTitle
+          formHeaderActions
+        }
+      } else {
+        ZStack {
+          formHeaderTitle
+          formHeaderActions
+        }
       }
     }
-    .font(.system(size: 16, weight: .light))
-    .foregroundStyle(AppTheme.tint)
     .padding(.horizontal, 16)
     .padding(.vertical, 4)
+  }
+
+  private var formHeaderTitle: some View {
+    Text(originalTimestamp == nil ? "Add Manual Record" : "Edit Record Entry")
+      .font(.system(.title3, design: .default, weight: .light))
+      .foregroundStyle(AppTheme.header)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
+  private var formHeaderActions: some View {
+    HStack {
+      Button { dismiss() } label: {
+        Text("Cancel")
+          .frame(minWidth: 72, minHeight: 44, alignment: .leading)
+          .contentShape(Rectangle())
+      }
+
+      Spacer()
+
+      Button { save() } label: {
+        Text("Save")
+          .frame(minWidth: 72, minHeight: 44, alignment: .trailing)
+          .contentShape(Rectangle())
+      }
+      .accessibilityIdentifier(originalTimestamp == nil ? "Add Record" : "Save Changes")
+    }
+    .font(.system(.body, design: .default, weight: .light))
+    .foregroundStyle(AppTheme.control)
   }
 
   private func save() {

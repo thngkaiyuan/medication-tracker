@@ -3,6 +3,7 @@ import SwiftUI
 struct MedicationDetailView: View {
   @EnvironmentObject private var store: MedicationStore
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   let medicationID: String
 
@@ -18,30 +19,40 @@ struct MedicationDetailView: View {
           detailHeader(for: medication)
           Divider()
 
-          List {
-            if medication.records.isEmpty {
-              Text("No records yet.")
-                .font(.system(size: 16, weight: .light))
-                .foregroundStyle(Color(uiColor: .systemGray2))
-                .frame(maxWidth: .infinity)
-                .padding(.top, 72)
-                .listRowSeparator(.hidden)
-            } else {
-              ForEach(Array(medication.sortedRecords.enumerated()), id: \.offset) {
-                index, timestamp in
-                recordRow(number: index + 1, timestamp: timestamp)
-                  .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 10))
-                  .listRowSeparatorTint(Color(uiColor: .systemGray5))
+          ScrollViewReader { scrollProxy in
+            List {
+              if medication.records.isEmpty {
+                Text("No records yet.")
+                  .font(.system(.body, design: .default, weight: .light))
+                  .foregroundStyle(AppTheme.mutedText)
+                  .frame(maxWidth: .infinity)
+                  .padding(.top, 72)
+                  .listRowSeparator(.hidden)
+              } else {
+                ForEach(Array(medication.sortedRecords.enumerated()), id: \.offset) {
+                  index, timestamp in
+                  recordRow(number: index + 1, timestamp: timestamp)
+                    .id(index)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 10))
+                    .listRowSeparatorTint(Color(uiColor: .systemGray5))
+                }
               }
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .onAppear {
+              scrollToLatestRecord(in: medication, using: scrollProxy)
+            }
+            .onChange(of: medication.records.count) { _ in
+              scrollToLatestRecord(in: medication, using: scrollProxy)
+            }
           }
-          .listStyle(.plain)
-          .scrollContentBackground(.hidden)
         }
         .background(Color(uiColor: .systemBackground))
         .toolbar(.hidden, for: .navigationBar)
-        .safeAreaInset(edge: .bottom, spacing: 0) {
+        .safeAreaInset(edge: .bottom, spacing: -footerOverlap) {
           bottomBar
+            .offset(y: footerOverlap)
         }
         .sheet(isPresented: $showingEditMedication) {
           MedicationFormView(medication: medication) {
@@ -87,38 +98,64 @@ struct MedicationDetailView: View {
   }
 
   private func detailHeader(for medication: Medication) -> some View {
-    HStack(spacing: 8) {
-      Button {
-        dismiss()
-      } label: {
-        Image(systemName: "chevron.left")
-          .font(.title3.weight(.regular))
-          .frame(width: 44, height: 44)
+    ViewThatFits(in: .horizontal) {
+      HStack(spacing: 8) {
+        backButton
+        Spacer(minLength: 0)
+        detailTitle(for: medication)
+          .lineLimit(1)
+          .fixedSize(horizontal: true, vertical: true)
+        Spacer(minLength: 0)
+        editButton
       }
-      .accessibilityLabel("Back")
 
-      Spacer(minLength: 0)
+      VStack(spacing: 0) {
+        HStack {
+          backButton
+          Spacer()
+          editButton
+        }
 
-      Text(medication.name.uppercased())
-        .font(.system(size: 19, weight: .light))
-        .tracking(-0.3)
-        .foregroundStyle(AppTheme.header)
-        .lineLimit(1)
-
-      Spacer(minLength: 0)
-
-      Button {
-        showingEditMedication = true
-      } label: {
-        Image(systemName: "pencil")
-          .font(.body.weight(.light))
-          .frame(width: 44, height: 44)
+        detailTitle(for: medication)
+          .fixedSize(horizontal: false, vertical: true)
+          .padding(.horizontal, 16)
+          .padding(.bottom, 8)
       }
-      .accessibilityLabel("Edit Medication")
     }
-    .foregroundStyle(AppTheme.tint)
+    .foregroundStyle(AppTheme.control)
     .padding(.horizontal, 8)
     .padding(.vertical, 4)
+  }
+
+  private var backButton: some View {
+    Button {
+      dismiss()
+    } label: {
+      Image(systemName: "chevron.left")
+        .font(.title3.weight(.regular))
+        .frame(width: 44, height: 44)
+    }
+    .accessibilityLabel("Back")
+  }
+
+  private var editButton: some View {
+    Button {
+      showingEditMedication = true
+    } label: {
+      Image(systemName: "pencil")
+        .font(.body.weight(.light))
+        .frame(width: 44, height: 44)
+    }
+    .accessibilityLabel("Edit Medication")
+  }
+
+  private func detailTitle(for medication: Medication) -> some View {
+    Text(medication.name.uppercased())
+      .font(.system(.title3, design: .default, weight: .light))
+      .tracking(-0.3)
+      .foregroundStyle(AppTheme.header)
+      .multilineTextAlignment(.center)
+      .layoutPriority(1)
   }
 
   private func recordRow(number: Int, timestamp: Double) -> some View {
@@ -126,11 +163,11 @@ struct MedicationDetailView: View {
 
     return HStack(spacing: 12) {
       Text("\(number).")
-        .font(.system(size: 17, weight: .light))
+        .font(.system(.body, design: .default, weight: .light))
         .frame(minWidth: 30, alignment: .trailing)
 
       Text(date.formatted(date: .abbreviated, time: .shortened))
-        .font(.system(size: 17, weight: .light))
+        .font(.system(.body, design: .default, weight: .light))
 
       Spacer()
 
@@ -167,7 +204,7 @@ struct MedicationDetailView: View {
       } label: {
         Label("Edit", systemImage: "pencil")
       }
-      .tint(AppTheme.tint)
+      .tint(AppTheme.control)
     }
   }
 
@@ -176,15 +213,41 @@ struct MedicationDetailView: View {
       recordEditor = RecordEditor(timestamp: nil)
     } label: {
       Label("Add Manual Record", systemImage: "plus")
-        .font(.system(size: 17, weight: .light))
+        .font(.system(.body, design: .default, weight: .light))
+        .lineLimit(2)
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity)
-        .frame(height: 58)
+        .padding(.top, footerTopPadding)
+        .padding(.bottom, footerBottomPadding)
     }
     .accessibilityLabel("Add Manual Record")
-    .foregroundStyle(AppTheme.tint)
+    .foregroundStyle(AppTheme.control)
     .background(Color(uiColor: .systemBackground).ignoresSafeArea(edges: .bottom))
     .overlay(alignment: .top) { Divider() }
-    .overlay(alignment: .bottom) { Divider() }
+  }
+
+  private var footerOverlap: CGFloat {
+    dynamicTypeSize.isAccessibilitySize ? 0 : 15
+  }
+
+  private var footerTopPadding: CGFloat {
+    dynamicTypeSize.isAccessibilitySize ? 16 : 24
+  }
+
+  private var footerBottomPadding: CGFloat {
+    dynamicTypeSize.isAccessibilitySize ? 16 : 8
+  }
+
+  private func scrollToLatestRecord(
+    in medication: Medication,
+    using proxy: ScrollViewProxy
+  ) {
+    guard !medication.records.isEmpty else { return }
+    let latestIndex = medication.records.count - 1
+    DispatchQueue.main.async {
+      proxy.scrollTo(latestIndex, anchor: .bottom)
+    }
   }
 }
 

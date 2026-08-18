@@ -19,18 +19,17 @@ struct MedicationCard: View {
     Button(action: action) {
       VStack(spacing: 7) {
         Text(medication.name.uppercased())
-          .font(.system(size: 23, weight: .light))
-          .tracking(-0.35)
-          .lineLimit(2)
+          .font(.title2.weight(.light))
           .multilineTextAlignment(.center)
+          .fixedSize(horizontal: false, vertical: true)
 
         Text(statusText)
-          .font(.system(size: 15, weight: .light))
-          .foregroundStyle(.white.opacity(0.85))
+          .font(.system(.subheadline, design: .default, weight: .light))
+          .foregroundStyle(.white)
 
         Text(lastDoseText)
-          .font(.system(size: 13, weight: .light))
-          .foregroundStyle(.white.opacity(0.75))
+          .font(.system(.caption, design: .default, weight: .light))
+          .foregroundStyle(.white)
       }
       .foregroundStyle(.white)
       .padding(.horizontal, 16)

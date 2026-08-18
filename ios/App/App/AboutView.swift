@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AboutView: View {
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   var body: some View {
     NavigationStack {
@@ -13,15 +14,16 @@ struct AboutView: View {
           Section {
             VStack(spacing: 14) {
               Image(systemName: "pills.circle.fill")
-                .font(.system(size: 58))
+                .font(.largeTitle)
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(AppTheme.tint)
+                .foregroundStyle(AppTheme.control)
+                .accessibilityHidden(true)
               Text("MedTracker")
-                .font(.system(size: 24, weight: .light))
+                .font(.system(.title2, design: .default, weight: .light))
                 .foregroundStyle(AppTheme.header)
               Text("Private medication dose history, stored entirely on your device.")
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(AppTheme.mutedText)
                 .multilineTextAlignment(.center)
                 .lineSpacing(3)
                 .frame(maxWidth: 300)
@@ -31,52 +33,100 @@ struct AboutView: View {
             .padding(.vertical, 18)
           }
 
-          Section("Privacy") {
-            Label("No accounts, analytics, ads, or tracking", systemImage: "hand.raised.fill")
-            Label("Medication data stays on this device", systemImage: "iphone")
-            Label("Data leaves only when you export a backup", systemImage: "square.and.arrow.up")
+          Section {
+            privacyLabel("No accounts, analytics, ads, or tracking", icon: "hand.raised.fill")
+            privacyLabel("Medication data stays on this device", icon: "iphone")
+            privacyLabel("Data leaves only when you export a backup", icon: "square.and.arrow.up")
 
             Link(
               "Read the full privacy policy",
               destination: URL(
                 string: "https://thngkaiyuan.github.io/medication-tracker/privacy.html")!
             )
+            .font(.body)
+          } header: {
+            sectionHeader("Privacy")
           }
 
-          Section("Medical disclaimer") {
+          Section {
             Text(
               "MedTracker is a personal record-keeping tool, not a medical device and not a substitute for professional medical advice. Follow the instructions of your clinician and pharmacist."
             )
+            .fixedSize(horizontal: false, vertical: true)
+          } header: {
+            sectionHeader("Medical disclaimer")
           }
 
-          Section("Support") {
+          Section {
             Link(
               "Get support on GitHub",
               destination: URL(string: "https://github.com/thngkaiyuan/medication-tracker/issues")!
             )
+            .font(.body)
+          } header: {
+            sectionHeader("Support")
           }
         }
-        .font(.system(size: 16, weight: .light))
       }
       .toolbar(.hidden, for: .navigationBar)
     }
   }
 
   private var aboutHeader: some View {
-    ZStack {
-      Text("Privacy & About")
-        .font(.system(size: 19, weight: .light))
-        .foregroundStyle(AppTheme.header)
-
-      HStack {
-        Spacer()
-        Button("Done") { dismiss() }
-          .frame(width: 72, height: 44, alignment: .trailing)
+    Group {
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 0) {
+          aboutHeaderTitle
+          HStack {
+            Spacer()
+            doneButton
+          }
+        }
+      } else {
+        ZStack {
+          aboutHeaderTitle
+          HStack {
+            Spacer()
+            doneButton
+          }
+        }
       }
     }
-    .font(.system(size: 16, weight: .light))
-    .foregroundStyle(AppTheme.tint)
+    .foregroundStyle(AppTheme.control)
     .padding(.horizontal, 16)
     .padding(.vertical, 4)
+  }
+
+  private var aboutHeaderTitle: some View {
+    Text("Privacy & About")
+      .font(.system(.title3, design: .default, weight: .light))
+      .foregroundStyle(AppTheme.header)
+      .fixedSize(horizontal: false, vertical: true)
+  }
+
+  private var doneButton: some View {
+    Button { dismiss() } label: {
+      Text("Done")
+        .frame(minWidth: 72, minHeight: 44, alignment: .trailing)
+        .contentShape(Rectangle())
+    }
+    .font(.body)
+  }
+
+  private func privacyLabel(_ title: String, icon: String) -> some View {
+    Label {
+      Text(title)
+        .font(.body)
+        .fixedSize(horizontal: false, vertical: true)
+    } icon: {
+      Image(systemName: icon)
+    }
+  }
+
+  private func sectionHeader(_ title: String) -> some View {
+    Text(title)
+      .font(.subheadline)
+      .foregroundStyle(.primary)
+      .fixedSize(horizontal: false, vertical: true)
   }
 }
