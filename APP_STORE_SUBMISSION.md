@@ -46,7 +46,7 @@ In Xcode:
 ## App Store Connect values
 
 - Name: `MedTracker: Private Dose Log`
-- Subtitle: `Private medication dose log`
+- Subtitle: `Offline medication history`
 - Primary category: `Health & Fitness`
 - Secondary category: `Medical`
 - Bundle ID: `com.kaiyuan.medicationtracker`

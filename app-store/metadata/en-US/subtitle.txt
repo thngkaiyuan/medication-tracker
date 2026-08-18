@@ -1,1 +1,1 @@
-Private medication dose log
+Offline medication history
