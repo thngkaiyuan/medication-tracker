@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "ios:sync": "npm run build && cap sync ios",
     "ios:open": "npm run ios:sync && cap open ios",
-    "test": "node --test tests/*.test.js"
+    "test": "npm run build && cap copy ios && node --test tests/*.test.js"
   },
   "dependencies": {
     "@capacitor/core": "^8.0.0",

@@ -492,6 +492,7 @@ class MedicationTracker {
                 const fileName = `medication_tracker_backup_${new Date().toISOString().slice(0,10)}.json`;
 
                 if (Capacitor.isNativePlatform()) {
+                    let backupWritten = false;
                     try {
                         const savedFile = await Filesystem.writeFile({
                             path: fileName,
@@ -499,18 +500,26 @@ class MedicationTracker {
                             directory: Directory.Cache,
                             encoding: Encoding.UTF8
                         });
+                        backupWritten = true;
                         await Share.share({
                             title: 'Medication Tracker Backup',
                             text: 'Medication Tracker data backup',
                             url: savedFile.uri,
                             dialogTitle: 'Save or share your backup'
                         });
-                        await Filesystem.deleteFile({ path: fileName, directory: Directory.Cache });
                         this.showToast('Data exported successfully.');
                     } catch (error) {
-                        if (error?.message !== 'Share canceled') {
+                        if (!error?.message?.toLowerCase().includes('cancel')) {
                             console.error('Error exporting data:', error);
                             this.showToast('Could not export data. Please try again.');
+                        }
+                    } finally {
+                        if (backupWritten) {
+                            try {
+                                await Filesystem.deleteFile({ path: fileName, directory: Directory.Cache });
+                            } catch (cleanupError) {
+                                console.warn('Could not remove temporary backup file:', cleanupError);
+                            }
                         }
                     }
                     return;
@@ -650,15 +659,29 @@ class MedicationTracker {
                     this.dom.recordsContent.innerHTML = '<div class="empty-records">No records yet.</div>';
                 } else {
                     const sortedRecords = [...records].sort((a, b) => a - b); // Sorts oldest to newest
-                    this.dom.recordsContent.innerHTML = sortedRecords.map((timestamp, index) =>
-                        `<div class="record-item" data-timestamp="${timestamp}">
-                            <span class="record-number">${index + 1}.</span>
-                            <span class="record-datetime">${this.formatDateTime(timestamp)}</span>
-                            <button class="record-entry-action-btn" data-timestamp="${timestamp}" aria-label="Edit or Delete Record Entry">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>
-                            </button>
-                        </div>`
-                    ).join('');
+                    const recordElements = sortedRecords.map((timestamp, index) => {
+                        const row = document.createElement('div');
+                        row.className = 'record-item';
+                        row.dataset.timestamp = String(timestamp);
+
+                        const number = document.createElement('span');
+                        number.className = 'record-number';
+                        number.textContent = `${index + 1}.`;
+
+                        const dateTime = document.createElement('span');
+                        dateTime.className = 'record-datetime';
+                        dateTime.textContent = this.formatDateTime(timestamp);
+
+                        const action = document.createElement('button');
+                        action.className = 'record-entry-action-btn';
+                        action.dataset.timestamp = String(timestamp);
+                        action.setAttribute('aria-label', `Edit or delete record ${index + 1}`);
+                        action.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>';
+
+                        row.append(number, dateTime, action);
+                        return row;
+                    });
+                    this.dom.recordsContent.replaceChildren(...recordElements);
 
                     this.dom.recordsContent.querySelectorAll('.record-entry-action-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
@@ -734,6 +757,12 @@ class MedicationTracker {
                     e.stopPropagation();
                     this.showActionChoiceModal(medication);
                 });
+                element.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.showActionChoiceModal(medication);
+                    }
+                });
             }
 
 
@@ -744,24 +773,42 @@ class MedicationTracker {
                     container.innerHTML = `<div class="empty-records"><p>No medications added yet.</p><p style="font-size: 14px; margin-top: 8px;">Tap an action below to start.</p></div>`;
                     return;
                 }
-                container.innerHTML = this.medications.map(med => {
+                const medicationElements = this.medications.map(med => {
                     const statusText = this.isSafeToConsume(med) ? 'Safe to take now' : `Next dose in: ${this.formatDuration(this.getTimeUntilNextDose(med))}`;
                     let lastConsumedText = 'Last: Never';
                     if (med.records && med.records.length > 0) {
                         const lastRecordTimestamp = Math.max(...med.records);
                         lastConsumedText = `Last: ${this.formatDateTime(lastRecordTimestamp)}`;
                     }
-                    return `
-                        <div class="medication-item" data-id="${med.id}" style="background: ${this.getCardColor(med)};">
-                            <div class="medication-content-wrapper">
-                                <div class="medication-content">
-                                    <div class="medication-name">${med.name}</div>
-                                    <div class="medication-status">${statusText}</div>
-                                    <div class="medication-last-consumed">${lastConsumedText}</div>
-                                </div>
-                            </div>
-                        </div>`;
-                }).join('');
+                    const item = document.createElement('div');
+                    item.className = 'medication-item';
+                    item.dataset.id = med.id;
+                    item.style.background = this.getCardColor(med);
+                    item.tabIndex = 0;
+                    item.setAttribute('role', 'button');
+                    item.setAttribute('aria-label', `${med.name}. ${statusText}. ${lastConsumedText}`);
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'medication-content-wrapper';
+                    const content = document.createElement('div');
+                    content.className = 'medication-content';
+
+                    const medicationName = document.createElement('div');
+                    medicationName.className = 'medication-name';
+                    medicationName.textContent = med.name;
+                    const medicationStatus = document.createElement('div');
+                    medicationStatus.className = 'medication-status';
+                    medicationStatus.textContent = statusText;
+                    const lastConsumed = document.createElement('div');
+                    lastConsumed.className = 'medication-last-consumed';
+                    lastConsumed.textContent = lastConsumedText;
+
+                    content.append(medicationName, medicationStatus, lastConsumed);
+                    wrapper.append(content);
+                    item.append(wrapper);
+                    return item;
+                });
+                container.replaceChildren(...medicationElements);
                 container.querySelectorAll('.medication-item').forEach(item => {
                     const med = this.medications.find(m => m.id === item.dataset.id);
                     if (med) this.setupItemSwipeGestures(item, med);
@@ -797,7 +844,7 @@ class MedicationTracker {
             loadMedications() {
                 try {
                     const saved = JSON.parse(localStorage.getItem('medications') || '[]');
-                    return Array.isArray(saved) ? saved : [];
+                    return parseMedicationBackup(saved);
                 } catch (error) {
                     console.error('Could not read saved medication data:', error);
                     return [];

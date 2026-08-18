@@ -1,4 +1,4 @@
-const CACHE_NAME = 'medtracker-v1';
+const CACHE_NAME = 'medtracker-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -24,12 +24,19 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
-      if (response.ok && new URL(event.request.url).origin === self.location.origin) {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-      }
-      return response;
-    }))
+    fetch(event.request)
+      .then((response) => {
+        if (response.ok && new URL(event.request.url).origin === self.location.origin) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      })
+      .catch(async () => {
+        const cached = await caches.match(event.request);
+        if (cached) return cached;
+        if (event.request.mode === 'navigate') return caches.match('./index.html');
+        return Response.error();
+      })
   );
 });

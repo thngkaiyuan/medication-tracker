@@ -25,3 +25,18 @@ test('iOS privacy manifest declares the filesystem timestamp reason', async () =
     assert.match(manifest, /C617\.1/);
     assert.match(manifest, /<key>NSPrivacyTracking<\/key>\s*<false\/>/);
 });
+
+test('iOS metadata declares that the app does not use non-exempt encryption', async () => {
+    const infoPlist = await readFile(new URL('../ios/App/App/Info.plist', import.meta.url), 'utf8');
+    assert.match(infoPlist, /<key>ITSAppUsesNonExemptEncryption<\/key>\s*<false\/>/);
+});
+
+test('App Store icon is an exact opaque 1024px PNG', async () => {
+    const icon = await readFile(new URL('../ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png', import.meta.url));
+    assert.equal(icon.subarray(1, 4).toString(), 'PNG');
+    assert.equal(icon.readUInt32BE(16), 1024);
+    assert.equal(icon.readUInt32BE(20), 1024);
+
+    // PNG color types 4 and 6 contain an alpha channel; App Store icons may not.
+    assert.ok(![4, 6].includes(icon[25]), `unexpected alpha-bearing PNG color type ${icon[25]}`);
+});
