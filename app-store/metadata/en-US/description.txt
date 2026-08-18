@@ -1,0 +1,11 @@
+MedTracker is a simple, private way to record medication doses and see when the next dose is due.
+
+• Add medications with custom intervals and optional daily limits
+• Log a dose in a tap
+• Review, add, edit, and delete dose-history entries
+• Export and import portable JSON backups
+• Use every tracking feature without an internet connection
+
+Your medication data stays on your device. MedTracker has no accounts, analytics, advertising, or tracking.
+
+MedTracker is a personal record-keeping tool. It does not diagnose, prescribe, recommend doses, or replace advice from your clinician or pharmacist.

@@ -1,0 +1,9 @@
+MedTracker is a personal record-keeping tool and does not diagnose, prescribe, recommend doses, or provide medical advice. No account is required, no demo credentials are needed, and all tracking functionality works offline.
+
+To exercise the core flow:
+1. Tap Add Medication and save a medication.
+2. Tap its full-width card.
+3. Choose Log Dose or View Records.
+4. Use the pencil and ellipsis controls to edit or delete data.
+
+Export Backup opens the native iOS share sheet. Import Backup accepts a compatible JSON backup selected by the reviewer through the native document picker. The app does not transmit medication data or contact a developer-operated service.
