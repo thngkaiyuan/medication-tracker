@@ -50,6 +50,27 @@ You can install this app on your Android device for a more native experience:
     3.  Tap "Add to Home screen."
     4.  Confirm by tapping "Install" on the prompt. The app icon will be added to your home screen.
 
+## iOS App
+
+The repository now includes a Capacitor iOS project in `ios/`. The app bundles the full web experience for reliable offline use and uses the native iOS share sheet when exporting backups.
+
+### Local development
+
+```sh
+npm ci
+npm run dev
+```
+
+### Open the iOS project
+
+Full Xcode is required:
+
+```sh
+npm run ios:open
+```
+
+See [APP_STORE_SUBMISSION.md](APP_STORE_SUBMISSION.md) for signing, device verification, privacy, and App Store Connect instructions.
+
 ## How to Use
 
 ### Main Screen

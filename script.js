@@ -1,3 +1,8 @@
+import { Capacitor } from '@capacitor/core';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
+import { parseMedicationBackup } from './data.js';
+
 class MedicationTracker {
             constructor() {
                 this.dom = {
@@ -48,7 +53,7 @@ class MedicationTracker {
                     deleteRecordEntryBtn: document.getElementById('deleteRecordEntryBtn')
                 };
 
-                this.medications = JSON.parse(localStorage.getItem('medications') || '[]');
+                this.medications = this.loadMedications();
                 this.currentRecordsMedication = null;
                 this.editingMedicationId = null;
                 this.confirmingDeleteMedication = false;
@@ -128,8 +133,8 @@ class MedicationTracker {
                     e.stopPropagation();
                     this.toggleOptionsMenu();
                 });
-                this.dom.exportDataMenuBtn.addEventListener('click', () => {
-                    this.exportData();
+                this.dom.exportDataMenuBtn.addEventListener('click', async () => {
+                    await this.exportData();
                     this.toggleOptionsMenu(false);
                 });
                 this.dom.importDataMenuBtn.addEventListener('click', () => {
@@ -478,17 +483,44 @@ class MedicationTracker {
             }
 
 
-            exportData() {
+            async exportData() {
                 if (this.medications.length === 0) {
                     this.showToast('No data to export.');
                     return;
                 }
                 const jsonData = JSON.stringify(this.medications, null, 2);
+                const fileName = `medication_tracker_backup_${new Date().toISOString().slice(0,10)}.json`;
+
+                if (Capacitor.isNativePlatform()) {
+                    try {
+                        const savedFile = await Filesystem.writeFile({
+                            path: fileName,
+                            data: jsonData,
+                            directory: Directory.Cache,
+                            encoding: Encoding.UTF8
+                        });
+                        await Share.share({
+                            title: 'Medication Tracker Backup',
+                            text: 'Medication Tracker data backup',
+                            url: savedFile.uri,
+                            dialogTitle: 'Save or share your backup'
+                        });
+                        await Filesystem.deleteFile({ path: fileName, directory: Directory.Cache });
+                        this.showToast('Data exported successfully.');
+                    } catch (error) {
+                        if (error?.message !== 'Share canceled') {
+                            console.error('Error exporting data:', error);
+                            this.showToast('Could not export data. Please try again.');
+                        }
+                    }
+                    return;
+                }
+
                 const blob = new Blob([jsonData], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `medication_tracker_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.download = fileName;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -505,11 +537,7 @@ class MedicationTracker {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
-                        const importedMedications = JSON.parse(e.target.result);
-                        if (!Array.isArray(importedMedications)) {
-                            throw new Error('Invalid file format: Not an array.');
-                        }
-                        this.medications = importedMedications;
+                        this.medications = parseMedicationBackup(JSON.parse(e.target.result));
                         this.saveAndRender();
                         this.showToast(`Data imported successfully. ${this.medications.length} medication(s) loaded.`);
                     } catch (error) {
@@ -766,7 +794,24 @@ class MedicationTracker {
                 this.dom.toast.classList.add('active');
                 this.toastTimeout = setTimeout(() => this.dom.toast.classList.remove('active'), 2800);
             }
-            saveMedications() { localStorage.setItem('medications', JSON.stringify(this.medications)); }
+            loadMedications() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('medications') || '[]');
+                    return Array.isArray(saved) ? saved : [];
+                } catch (error) {
+                    console.error('Could not read saved medication data:', error);
+                    return [];
+                }
+            }
+
+            saveMedications() {
+                try {
+                    localStorage.setItem('medications', JSON.stringify(this.medications));
+                } catch (error) {
+                    console.error('Could not save medication data:', error);
+                    this.showToast('Could not save your changes. Storage may be full.');
+                }
+            }
         }
 
         const tracker = new MedicationTracker();
@@ -778,7 +823,7 @@ class MedicationTracker {
             lastTouchEnd = now;
         }, { passive: false });
 
-        if ('serviceWorker' in navigator) {
+        if (!Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then(registration => {
                     console.log('Service Worker registered successfully with scope:', registration.scope);

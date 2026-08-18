@@ -47,11 +47,13 @@
             user-select: none;
             overflow-x: hidden;
             font-weight: var(--base-font-weight);
+            min-height: 100%;
         }
 
         .app-container {
             width: 100%;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             position: relative;
         }
@@ -96,7 +98,7 @@
 
         .header {
             text-align: center;
-            padding: 20px 20px 32px;
+            padding: calc(20px + env(safe-area-inset-top)) 20px 32px;
         }
 
         .header h1 {
@@ -160,6 +162,7 @@
             display: flex;
             align-items: stretch;
             border-top: 1px solid var(--border-color-light);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .more-options-wrapper {
@@ -427,7 +430,7 @@
 
 
         .records-header {
-            padding: 20px;
+            padding: calc(20px + env(safe-area-inset-top)) 20px 20px;
             text-align: center;
             border-bottom: 1px solid var(--border-color-light);
             display: flex;
@@ -518,6 +521,7 @@
 
         .records-footer-action {
             border-top: 1px solid var(--border-color-light);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         #addManualRecordBtn {
             width: 100%;
@@ -541,7 +545,7 @@
 
         .toast {
             position: fixed;
-            bottom: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom));
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: var(--toast-bg);
@@ -566,8 +570,8 @@
         }
 
         @media (max-width: 480px) {
-            .header { padding: 16px 16px 24px; }
-            .records-header { padding: 16px; }
+            .header { padding: calc(16px + env(safe-area-inset-top)) 16px 24px; }
+            .records-header { padding: calc(16px + env(safe-area-inset-top)) 16px 16px; }
             .records-content { padding: 0 16px; }
             .medications-list { padding-bottom: 16px; }
 
