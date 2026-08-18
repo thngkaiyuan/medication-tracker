@@ -47,8 +47,8 @@ In Xcode:
 
 - Name: `MedTracker: Private Dose Log`
 - Subtitle: `Offline medication history`
-- Primary category: `Health & Fitness`
-- Secondary category: `Medical`
+- Primary category: `Medical`
+- Secondary category: `Health & Fitness`
 - Bundle ID: `com.kaiyuan.medicationtracker`
 - Version: `1.0`
 - SKU suggestion: `medtracker-ios-001`
