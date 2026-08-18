@@ -50,7 +50,9 @@ In Xcode:
 - Version: `1.0`
 - SKU suggestion: `medtracker-ios-001`
 - Support URL: `https://github.com/thngkaiyuan/medication-tracker/issues`
+- Marketing URL: `https://github.com/thngkaiyuan/medication-tracker`
 - Privacy policy URL: `https://thngkaiyuan.github.io/medication-tracker/privacy.html`
+- Copyright: `2026 Positive` (the owner-requested brand; use the verified owner name instead if App Store Connect rejects it)
 - App Privacy: select **Data Not Collected**; the app has no tracking, analytics, ads, accounts, or remote data transmission.
 - Export compliance: answer that the app does not use encryption. It does not implement or invoke encryption algorithms.
 - Price: `Free` (recommended; confirm before submission)
@@ -84,7 +86,7 @@ Review notes:
 ## Exact handoff when the owner returns
 
 1. Confirm the paid Apple Developer Program membership is active and tell Codex which Team appears in Xcode.
-2. Confirm the bundle ID, seller/copyright name, support email/phone, price, availability, and EU trader status.
+2. Confirm the individual team shown by Apple and whether App Store Connect accepts the requested `2026 Positive` copyright string.
 3. Stay available briefly for Apple ID two-factor authentication and any agreement acceptance.
 4. Codex can then guide or complete the signing/archive/upload flow up to any Apple confirmation that must be performed by the account holder.
 

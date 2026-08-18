@@ -58,6 +58,8 @@ test('App Store metadata stays within Apple listing limits', async () => {
     const keywords = await readValue('keywords.txt');
     const supportURL = new URL(await readValue('support_url.txt'));
     const privacyURL = new URL(await readValue('privacy_url.txt'));
+    const marketingURL = new URL(await readValue('marketing_url.txt'));
+    const copyright = await readValue('copyright.txt');
 
     assert.ok(name.length >= 2 && name.length <= 30);
     assert.ok(subtitle.length <= 30);
@@ -67,6 +69,8 @@ test('App Store metadata stays within Apple listing limits', async () => {
     assert.ok(keywords.split(',').every((keyword) => keyword.length > 2));
     assert.equal(supportURL.protocol, 'https:');
     assert.equal(privacyURL.protocol, 'https:');
+    assert.equal(marketingURL.protocol, 'https:');
+    assert.match(copyright, /^\d{4}\s+\S/);
 });
 
 test('App Store screenshots use accepted opaque device dimensions', async () => {
