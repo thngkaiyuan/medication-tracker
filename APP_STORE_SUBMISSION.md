@@ -57,6 +57,7 @@ In Xcode:
 - Privacy policy URL: `https://thngkaiyuan.github.io/medication-tracker/privacy.html`
 - Copyright: `2026 Positive` (the owner-requested brand; use the verified owner name instead if App Store Connect rejects it)
 - App Privacy: select **Data Not Collected**; the app has no tracking, analytics, ads, accounts, or remote data transmission.
+- App Accessibility: indicate **Differentiate Without Color Alone** for iPhone and iPad. Medication status is always stated in text as well as represented by color. Leave other features unclaimed until they complete Apple's prescribed testing.
 - Export compliance: answer that the app does not use encryption. It does not implement or invoke encryption algorithms.
 - Price: `Free` (recommended; confirm before submission)
 - Availability: confirm the desired countries/regions

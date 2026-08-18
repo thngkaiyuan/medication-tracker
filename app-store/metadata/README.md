@@ -14,6 +14,7 @@ The `en-US` files contain copy-ready values for App Store Connect. They are deli
 - Copyright: `2026 Positive` (owner-requested brand; App Store acceptance is subject to Apple)
 - Marketing URL: `https://github.com/thngkaiyuan/medication-tracker`
 - Privacy: `Data Not Collected`
+- Accessibility: `Differentiate Without Color Alone` on iPhone and iPad (saved as drafts until Apple permits publication)
 - Third-party content: `No`
 - Demo account required: `No`
 - Regulated medical device: `No`
