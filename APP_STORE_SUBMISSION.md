@@ -71,7 +71,7 @@ Suggested description:
 
 Suggested keywords:
 
-`medication,dose,medicine,pill,history,schedule,offline,private,tracker,health`
+`medicine,pill,interval,backup,records,as needed,painkiller,tracker,OTC,prescription,countdown,diary`
 
 Review notes:
 
