@@ -2,6 +2,10 @@
 
 The app is implemented natively in SwiftUI for iPhone and iPad. Medication data is saved as JSON in the app's Application Support directory, all tracking features work offline, and backup import/export uses the native iOS document picker and share sheet. Its backup format is compatible with the PWA.
 
+## Submission status
+
+Version 1.0 build 1 was submitted to Apple App Review on 2026-08-18 at 11:28 PDT and is **Waiting for Review**. Apple confirmed that one item was submitted. Release is configured as **manual**, so approval will not publish the app until the account holder explicitly releases it.
+
 ## What is already complete
 
 - Native SwiftUI app for iPhone and iPad, with no web view or network dependency.
@@ -9,7 +13,7 @@ The app is implemented natively in SwiftUI for iPhone and iPad. Medication data 
 - Local persistence in Application Support and a privacy manifest declaring no collected data.
 - Automated unit, lifecycle, persistence, export, large-text, accessibility, Dark Mode, and portrait/landscape coverage on iPhone and iPad.
 - Release static analysis, signed archive validation, and a successful App Store Connect upload of version 1.0 build 1.
-- Privacy-safe screenshots under `app-store/screenshots`; all names and records are generated samples.
+- Privacy-safe screenshots under `app-store/screenshots`; all names and records are generated samples. Three iPhone 6.9-inch and three iPad 13-inch screenshots were uploaded to App Store Connect.
 
 ## Human prerequisites
 
@@ -28,7 +32,7 @@ This project is already built with Xcode 26 and the iOS 26 SDK, satisfying Apple
 - The privacy policy exists at `public/privacy.html`. An identical root copy was added to `main`, and `https://thngkaiyuan.github.io/medication-tracker/privacy.html` has been verified live with HTTP 200.
 - The paid Apple Developer Program membership is active. Xcode recognizes team `J3U6VV2679` as an App Store Connect team and has registered `com.kaiyuan.medicationtracker`.
 - App Store Connect record `6802761446` exists as `MedTracker: Private Dose Log`, and version 1.0 build 1 has been uploaded for processing.
-- The account holder must accept Apple's updated Developer Program License Agreement before submission.
+- App Store Connect accepted the submission without an outstanding agreement blocker.
 - Version 1.0 build 1 was installed and approved on the owner's physical iPhone 17 Pro. The tested source is frozen at tag `ios-v1.0-build1-approved` (`b84ac75`). Any release-code change requires another physical-device test and approval.
 
 ## Build and device verification
@@ -88,7 +92,7 @@ Review notes:
 5. In Organizer choose **Distribute App → App Store Connect → Upload**.
 6. Attach the uploaded build in App Store Connect and complete app privacy, age rating, content rights, encryption, medical-device, and review-contact questions.
 7. Install and test the exact release candidate on the owner's physical iPhone, record the approved commit/build, and make no further release changes without repeating that test.
-8. Only after the owner explicitly approves the frozen build, submit it for review.
+8. Only after the owner explicitly approves the frozen build, submit it for review. Completed for version 1.0 build 1 on 2026-08-18.
 
 ## Exact handoff when the owner returns
 

@@ -13,6 +13,8 @@ The `en-US` files contain copy-ready values for App Store Connect. They are deli
 - Price: `Free`
 - Availability: all 175 App Store countries or regions on app release
 - Device distribution: iPhone and iPad only; Apple Silicon Mac and Apple Vision Pro availability are disabled
+- Release method: manual
+- Review status: version 1.0 build 1 submitted 2026-08-18; Waiting for Review
 - Copyright: `2026 Positive` (owner-requested brand; App Store acceptance is subject to Apple)
 - Marketing URL: `https://github.com/thngkaiyuan/medication-tracker`
 - Privacy: `Data Not Collected`
