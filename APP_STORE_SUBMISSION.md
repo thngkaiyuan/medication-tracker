@@ -9,6 +9,8 @@ The app is implemented as an offline Capacitor iOS app. Its web assets ship insi
 3. In Xcode, add that Apple ID under **Xcode → Settings → Accounts**.
 4. Confirm that `com.kaiyuan.medicationtracker` is the desired globally unique bundle identifier. Change it in `capacitor.config.json` and the app target if it is not.
 
+A free Apple developer account is sufficient for simulator testing and temporary installation on the account owner's own iPhone. TestFlight and App Store distribution require the paid Apple Developer Program membership. It is safe to postpone payment until the app and listing assets are ready.
+
 ## Build and device verification
 
 ```sh
@@ -20,8 +22,9 @@ In Xcode:
 
 1. Select the **App** target, open **Signing & Capabilities**, choose the correct Team, and leave automatic signing enabled.
 2. Select a connected iPhone and press Run.
-3. With Airplane Mode enabled, verify launch, adding/editing/deleting medication, logging/editing/deleting a dose, manual records, and export/import.
-4. Repeat the core flow on an iPad simulator because the target supports iPhone and iPad.
+3. Choose **Product → Test** to run the native `AppUITests` medication lifecycle and export-share-sheet checks.
+4. With Airplane Mode enabled, manually verify launch, adding/editing/deleting medication, logging/editing/deleting a dose, manual records, and export/import.
+5. Repeat the core flow on an iPad simulator because the target supports iPhone and iPad.
 
 ## App Store Connect values
 
