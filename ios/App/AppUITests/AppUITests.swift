@@ -200,6 +200,39 @@ final class AppUITests: XCTestCase {
     attachScreenshot(named: "dark-appearance-about")
   }
 
+  func testLandscapeKeepsPrimaryNavigationUsable() throws {
+    let device = XCUIDevice.shared
+    addTeardownBlock {
+      device.orientation = .portrait
+    }
+    device.orientation = .landscapeLeft
+
+    let medicationName = "Landscape Medication"
+    let app = testApplication()
+    app.launchEnvironment["UITEST_SEED_RECORD_COUNT"] = "3"
+    app.launchEnvironment["UITEST_SEED_MEDICATION_NAME"] = medicationName
+    app.launch()
+
+    let window = app.windows.firstMatch
+    XCTAssertTrue(window.waitForExistence(timeout: 10))
+    XCTAssertGreaterThan(window.frame.width, window.frame.height)
+    XCTAssertTrue(element(containing: medicationName, in: app).isHittable)
+    XCTAssertTrue(button(containing: "Add Medication", in: app).isHittable)
+    attachScreenshot(named: "landscape-home")
+
+    openMedicationActions(named: medicationName, in: app, expecting: "View Records")
+    XCTAssertTrue(exactButton("View Records", in: app).isHittable)
+    XCTAssertTrue(exactButton("Log Dose", in: app).isHittable)
+    attachScreenshot(named: "landscape-actions")
+
+    exactButton("View Records", in: app).tap()
+    XCTAssertTrue(app.staticTexts["3."].waitForExistence(timeout: 10))
+    XCTAssertTrue(app.staticTexts["3."].isHittable)
+    XCTAssertTrue(app.buttons["Add Manual Record"].isHittable)
+    XCTAssertTrue(app.buttons["Back"].isHittable)
+    attachScreenshot(named: "landscape-history")
+  }
+
   func testAccessibilityTextSizeKeepsMedicationFormUsable() throws {
     let app = testApplication()
     app.launchArguments += [

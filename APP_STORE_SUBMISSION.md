@@ -7,7 +7,7 @@ The app is implemented natively in SwiftUI for iPhone and iPad. Medication data 
 - Native SwiftUI app for iPhone and iPad, with no web view or network dependency.
 - PWA-compatible JSON import/export through the native document picker and share sheet.
 - Local persistence in Application Support and a privacy manifest declaring no collected data.
-- Automated unit, lifecycle, persistence, export, large-text, and accessibility coverage on iPhone and iPad.
+- Automated unit, lifecycle, persistence, export, large-text, accessibility, Dark Mode, and portrait/landscape coverage on iPhone and iPad.
 - Release static analysis and an unsigned Release archive validation.
 - Privacy-safe screenshots under `app-store/screenshots`; all names and records are generated samples.
 
