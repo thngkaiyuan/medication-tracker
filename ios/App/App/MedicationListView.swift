@@ -41,7 +41,7 @@ struct MedicationListView: View {
           }
         }
       }
-      .background(AppTheme.dialogBackground)
+      .background(Color(uiColor: .systemBackground))
       .toolbar(.hidden, for: .navigationBar)
       .navigationDestination(for: String.self) { medicationID in
         MedicationDetailView(medicationID: medicationID)
@@ -151,7 +151,7 @@ struct MedicationListView: View {
         }
         .font(.system(.body, design: .default, weight: .light))
       }
-      .background(Color(uiColor: .systemBackground))
+      .background(AppTheme.dialogBackground)
       .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
       .shadow(color: .black.opacity(0.14), radius: 14, y: 5)
       .frame(maxWidth: 400)
