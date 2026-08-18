@@ -9,6 +9,7 @@
             --border-color-light: #EEEEEE;
             --border-color-input: #E0E0E0;
             --accent-color: #92A3A7;
+            --accent-focus-ring: rgba(146, 163, 167, 0.24);
             --action-color-undo: #D32F2F;
             --action-color-redo: #2196F3;
             --action-color-delete: #D32F2F;
@@ -161,12 +162,25 @@
         .footer-actions {
             display: flex;
             align-items: stretch;
+            position: relative;
             border-top: 1px solid var(--border-color-light);
             padding-bottom: env(safe-area-inset-bottom);
+        }
+        .footer-actions::after {
+            content: '';
+            position: absolute;
+            z-index: 3;
+            right: 0;
+            bottom: env(safe-area-inset-bottom);
+            left: 0;
+            height: 1px;
+            background: var(--border-color-light);
+            pointer-events: none;
         }
 
         .more-options-wrapper {
             position: relative;
+            flex: 0 0 65px;
         }
 
         .action-button {
@@ -198,6 +212,7 @@
 
         .add-medication-footer-btn {
             flex-grow: 1;
+            padding-right: 83px;
             gap: 8px;
         }
 
@@ -276,27 +291,28 @@
         .modal-header {
             padding: 20px 24px 16px;
             border-bottom: 1px solid var(--border-color-light);
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 44px minmax(0, 1fr) 44px;
+            column-gap: 8px;
             align-items: center;
         }
 
         .modal-header h2 {
+            grid-column: 2;
             font-size: 20px;
             color: var(--text-color-header);
             font-weight: var(--base-font-weight);
             letter-spacing: -0.3px;
-            flex-grow: 1;
             text-align: center;
         }
         .modal-header .delete-med-icon-btn,
         .modal-header .record-entry-delete-btn {
-            flex-shrink: 0;
+            grid-column: 3;
+            justify-self: center;
         }
         #actionChoiceModal .modal-header h2,
         .modal-header h2:only-child {
-            margin-left: auto;
-            margin-right: auto;
+            grid-column: 2;
         }
 
 
@@ -360,7 +376,9 @@
             border: none;
             color: var(--action-color-delete);
             cursor: pointer;
-            padding: 4px;
+            width: 44px;
+            height: 44px;
+            padding: 12px;
             display: none;
         }
         .delete-med-icon-btn svg {
@@ -383,20 +401,26 @@
         }
 
         .form-group input {
+            display: block;
             width: 100%;
-            padding: 16px 0;
-            border: none;
-            border-bottom: 1px solid var(--border-color-input);
+            min-width: 0;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color-input);
+            border-radius: 8px;
             font-size: 16px;
             background: none;
-            transition: border-color 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
             font-weight: var(--base-font-weight);
             color: var(--text-color-header);
         }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--accent-focus-ring);
+        }
         .form-group input[type="date"], .form-group input[type="time"] {
-            padding: 12px 10px;
-            border: 1px solid var(--border-color-input);
-            border-radius: 4px;
+            padding: 12px 14px;
         }
 
 
@@ -420,7 +444,6 @@
             display: none;
         }
         #actionChoiceModal .modal-header {
-            justify-content: center;
             border-bottom: none;
             padding-bottom: 20px;
         }
@@ -520,8 +543,19 @@
         }
 
         .records-footer-action {
+            position: relative;
             border-top: 1px solid var(--border-color-light);
             padding-bottom: env(safe-area-inset-bottom);
+        }
+        .records-footer-action::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            bottom: env(safe-area-inset-bottom);
+            left: 0;
+            height: 1px;
+            background: var(--border-color-light);
+            pointer-events: none;
         }
         #addManualRecordBtn {
             width: 100%;
@@ -570,8 +604,8 @@
         }
 
         @media (max-width: 480px) {
-            .header { padding: calc(16px + env(safe-area-inset-top)) 16px 24px; }
-            .records-header { padding: calc(16px + env(safe-area-inset-top)) 16px 16px; }
+            .header { padding: calc(6px + env(safe-area-inset-top)) 16px 20px; }
+            .records-header { padding: calc(8px + env(safe-area-inset-top)) 16px 12px; }
             .records-content { padding: 0 16px; }
             .medications-list { padding-bottom: 16px; }
 

@@ -1,6 +1,6 @@
-# Medication Tracker PWA
+# Medication Tracker
 
-A simple, clean, and modern Progressive Web App (PWA) to help you track your medication intake, view your history, and manage your medication schedule effectively. All data is stored locally in your browser.
+A private, offline medication tracker available as a Progressive Web App and a native SwiftUI app for iPhone and iPad. Data is stored locally on the device.
 
 <img width="970" alt="image" src="https://github.com/user-attachments/assets/cfc4ba22-b1bf-43f7-a92d-7247157d9666" />
 
@@ -52,7 +52,9 @@ You can install this app on your Android device for a more native experience:
 
 ## iOS App
 
-The repository now includes a Capacitor iOS project in `ios/`. The app bundles the full web experience for reliable offline use and uses the native iOS share sheet when exporting backups.
+The repository includes a native SwiftUI project in `ios/`. It uses Apple-native navigation, forms, sheets, menus, file importing, and sharing. Medication data is persisted in Application Support, so every tracking feature works without a network connection.
+
+The native app and PWA intentionally use the same JSON backup schema. A backup exported by either version can be imported by the other.
 
 ### Local development
 
@@ -63,11 +65,13 @@ npm run dev
 
 ### Open the iOS project
 
-Full Xcode is required:
+Full Xcode is required. Open the project directly or run:
 
 ```sh
 npm run ios:open
 ```
+
+Choose the **App** scheme and an iPhone or iPad destination. Native tests live in the `AppTests` and `AppUITests` targets.
 
 See [APP_STORE_SUBMISSION.md](APP_STORE_SUBMISSION.md) for signing, device verification, privacy, and App Store Connect instructions.
 

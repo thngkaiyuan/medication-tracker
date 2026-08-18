@@ -1,28 +1,25 @@
 # App Store submission handoff
 
-The app is implemented as an offline Capacitor iOS app. Its web assets ship inside the application bundle, medication data remains in persistent local WebKit storage, and backup export uses the native iOS share sheet.
+The app is implemented natively in SwiftUI for iPhone and iPad. Medication data is saved as JSON in the app's Application Support directory, all tracking features work offline, and backup import/export uses the native iOS document picker and share sheet. Its backup format is compatible with the PWA.
 
 ## Human prerequisites
 
 1. Install the current full Xcode release from the Mac App Store and open it once to finish installing components.
 2. Join or renew the [Apple Developer Program](https://developer.apple.com/programs/) for the Apple ID that will own the app.
 3. In Xcode, add that Apple ID under **Xcode → Settings → Accounts**.
-4. Confirm that `com.kaiyuan.medicationtracker` is the desired globally unique bundle identifier. Change it in `capacitor.config.json` and the app target if it is not.
+4. Confirm that `com.kaiyuan.medicationtracker` is the desired globally unique bundle identifier. Change it in the app target if it is not.
 
 A free Apple developer account is sufficient for simulator testing and temporary installation on the account owner's own iPhone. TestFlight and App Store distribution require the paid Apple Developer Program membership. It is safe to postpone payment until the app and listing assets are ready.
 
 ## Build and device verification
 
-```sh
-npm ci
-npm run ios:open
-```
+Open `ios/App/App.xcodeproj` in Xcode, or run `npm run ios:open`.
 
 In Xcode:
 
 1. Select the **App** target, open **Signing & Capabilities**, choose the correct Team, and leave automatic signing enabled.
 2. Select a connected iPhone and press Run.
-3. Choose **Product → Test** to run the native `AppUITests` medication lifecycle and export-share-sheet checks.
+3. Choose **Product → Test** to run `AppTests` backup/persistence checks and `AppUITests` medication lifecycle and export-share-sheet checks.
 4. With Airplane Mode enabled, manually verify launch, adding/editing/deleting medication, logging/editing/deleting a dose, manual records, and export/import.
 5. Repeat the core flow on an iPad simulator because the target supports iPhone and iPad.
 
@@ -50,7 +47,7 @@ Suggested keywords:
 
 Review notes:
 
-> MedTracker is a personal record-keeping tool and does not diagnose, recommend doses, or provide medical advice. No account is required. All app functionality works offline. Test by adding a medication, tapping its tile, and choosing Log Dose or View Records. Export Data opens the native share sheet; Import Data accepts a JSON backup selected by the user.
+> MedTracker is a personal record-keeping tool and does not diagnose, recommend doses, or provide medical advice. No account is required. All app functionality works offline. Test by adding a medication, tapping its card, and choosing Log Dose or View Records. Export Backup opens the native share sheet; Import Backup accepts a compatible JSON backup selected by the user.
 
 ## Archive and submit
 

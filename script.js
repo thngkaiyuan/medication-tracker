@@ -1,6 +1,3 @@
-import { Capacitor } from '@capacitor/core';
-import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
 import { parseMedicationBackup } from './data.js';
 
 class MedicationTracker {
@@ -491,40 +488,6 @@ class MedicationTracker {
                 const jsonData = JSON.stringify(this.medications, null, 2);
                 const fileName = `medication_tracker_backup_${new Date().toISOString().slice(0,10)}.json`;
 
-                if (Capacitor.isNativePlatform()) {
-                    let backupWritten = false;
-                    try {
-                        const savedFile = await Filesystem.writeFile({
-                            path: fileName,
-                            data: jsonData,
-                            directory: Directory.Cache,
-                            encoding: Encoding.UTF8
-                        });
-                        backupWritten = true;
-                        await Share.share({
-                            title: 'Medication Tracker Backup',
-                            text: 'Medication Tracker data backup',
-                            url: savedFile.uri,
-                            dialogTitle: 'Save or share your backup'
-                        });
-                        this.showToast('Data exported successfully.');
-                    } catch (error) {
-                        if (!error?.message?.toLowerCase().includes('cancel')) {
-                            console.error('Error exporting data:', error);
-                            this.showToast('Could not export data. Please try again.');
-                        }
-                    } finally {
-                        if (backupWritten) {
-                            try {
-                                await Filesystem.deleteFile({ path: fileName, directory: Directory.Cache });
-                            } catch (cleanupError) {
-                                console.warn('Could not remove temporary backup file:', cleanupError);
-                            }
-                        }
-                    }
-                    return;
-                }
-
                 const blob = new Blob([jsonData], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -870,7 +833,7 @@ class MedicationTracker {
             lastTouchEnd = now;
         }, { passive: false });
 
-        if (!Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
+        if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
                 .then(registration => {
                     console.log('Service Worker registered successfully with scope:', registration.scope);

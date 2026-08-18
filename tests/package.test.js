@@ -13,10 +13,17 @@ test('production build contains the complete offline app shell', async () => {
     }
 });
 
-test('iOS bundle is synchronized with the web build', async () => {
-    const webIndex = await readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
-    const iosIndex = await readFile(new URL('../ios/App/App/public/index.html', import.meta.url), 'utf8');
-    assert.equal(iosIndex, webIndex);
+test('iOS app is a native SwiftUI application with local persistence and backups', async () => {
+    const appEntry = await readFile(new URL('../ios/App/App/MedTrackerApp.swift', import.meta.url), 'utf8');
+    const store = await readFile(new URL('../ios/App/App/MedicationStore.swift', import.meta.url), 'utf8');
+    const project = await readFile(new URL('../ios/App/App.xcodeproj/project.pbxproj', import.meta.url), 'utf8');
+
+    assert.match(appEntry, /@main\s+struct MedTrackerApp: App/);
+    assert.match(store, /applicationSupportDirectory/);
+    assert.match(store, /JSONEncoder/);
+    assert.match(store, /JSONDecoder/);
+    assert.doesNotMatch(project, /CapApp-SPM/);
+    assert.doesNotMatch(project, /public in Resources/);
 });
 
 test('iOS privacy manifest declares the filesystem timestamp reason', async () => {
