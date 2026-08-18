@@ -80,6 +80,15 @@ struct MedTrackerApp: App {
       MedicationListView()
         .environmentObject(store)
         .tint(AppTheme.control)
+        .preferredColorScheme(testColorScheme)
     }
+  }
+
+  private var testColorScheme: ColorScheme? {
+    #if DEBUG
+      ProcessInfo.processInfo.environment["UITEST_COLOR_SCHEME"] == "dark" ? .dark : nil
+    #else
+      nil
+    #endif
   }
 }

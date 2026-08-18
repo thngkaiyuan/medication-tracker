@@ -1,10 +1,26 @@
 import SwiftUI
 
 enum AppTheme {
-  static let tint = Color(red: 146 / 255, green: 163 / 255, blue: 167 / 255)
-  static let control = Color(red: 80 / 255, green: 102 / 255, blue: 107 / 255)
-  static let header = Color(red: 74 / 255, green: 74 / 255, blue: 74 / 255)
-  static let mutedText = Color(red: 95 / 255, green: 95 / 255, blue: 99 / 255)
+  static let tint = adaptive(
+    light: UIColor(red: 146 / 255, green: 163 / 255, blue: 167 / 255, alpha: 1),
+    dark: UIColor(red: 166 / 255, green: 187 / 255, blue: 191 / 255, alpha: 1)
+  )
+  static let control = adaptive(
+    light: UIColor(red: 80 / 255, green: 102 / 255, blue: 107 / 255, alpha: 1),
+    dark: UIColor(red: 166 / 255, green: 194 / 255, blue: 199 / 255, alpha: 1)
+  )
+  static let header = adaptive(
+    light: UIColor(red: 74 / 255, green: 74 / 255, blue: 74 / 255, alpha: 1),
+    dark: UIColor(white: 0.86, alpha: 1)
+  )
+  static let mutedText = adaptive(
+    light: UIColor(red: 95 / 255, green: 95 / 255, blue: 99 / 255, alpha: 1),
+    dark: UIColor(white: 0.74, alpha: 1)
+  )
+  static let dialogBackground = adaptive(
+    light: .systemBackground,
+    dark: .secondarySystemBackground
+  )
   static let readyStart = Color(red: 46 / 255, green: 125 / 255, blue: 50 / 255)
   static let readyEnd = readyStart
 
@@ -19,6 +35,12 @@ enum AppTheme {
     let blue = (0 + (50 - 0) * progress) / 255
     let base = Color(red: red, green: green, blue: blue)
     return [base, base]
+  }
+
+  private static func adaptive(light: UIColor, dark: UIColor) -> Color {
+    Color(uiColor: UIColor { traits in
+      traits.userInterfaceStyle == .dark ? dark : light
+    })
   }
 }
 

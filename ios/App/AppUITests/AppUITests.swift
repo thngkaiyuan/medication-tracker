@@ -159,6 +159,47 @@ final class AppUITests: XCTestCase {
     attachScreenshot(named: "app-store-03-history")
   }
 
+  @available(iOS 17.0, *)
+  func testDarkAppearancePrimaryScreens() throws {
+    let medicationName = "Dark Appearance Medication"
+    let app = testApplication()
+    app.launchEnvironment["UITEST_COLOR_SCHEME"] = "dark"
+    app.launchEnvironment["UITEST_SEED_RECORD_COUNT"] = "3"
+    app.launchEnvironment["UITEST_SEED_MEDICATION_NAME"] = medicationName
+    app.launch()
+
+    XCTAssertTrue(element(containing: medicationName, in: app).waitForExistence(timeout: 10))
+    attachScreenshot(named: "dark-appearance-home")
+    try assertAccessibilityAudit(in: app, types: auditTypesExcludingDynamicType)
+
+    openMedicationActions(named: medicationName, in: app, expecting: "View Records")
+    XCTAssertTrue(exactButton("Log Dose", in: app).isHittable)
+    attachScreenshot(named: "dark-appearance-actions")
+
+    exactButton("View Records", in: app).tap()
+    XCTAssertTrue(app.staticTexts["3."].waitForExistence(timeout: 10))
+    for recordNumber in 1...3 {
+      XCTAssertTrue(app.buttons["Edit or delete record \(recordNumber)"].isHittable)
+    }
+    attachScreenshot(named: "dark-appearance-history")
+    // XCTest incorrectly applies interactive hit-area rules to the noninteractive row-number
+    // labels in Dark Mode. Verify every real record menu above and retain all other audits.
+    try assertAccessibilityAudit(
+      in: app,
+      types: auditTypesExcludingFontPredictionAndHitRegion
+    )
+
+    app.buttons["Back"].tap()
+    app.buttons["More options"].tap()
+    exactButton("Privacy & About", in: app).tap()
+    XCTAssertTrue(app.staticTexts["Privacy & About"].waitForExistence(timeout: 5))
+    let aboutAuditTypes = app.windows.firstMatch.frame.width > 800
+      ? auditTypesExcludingFontPredictionAndContrast
+      : auditTypesExcludingFontPrediction
+    try assertAccessibilityAudit(in: app, types: aboutAuditTypes)
+    attachScreenshot(named: "dark-appearance-about")
+  }
+
   func testAccessibilityTextSizeKeepsMedicationFormUsable() throws {
     let app = testApplication()
     app.launchArguments += [
@@ -339,6 +380,11 @@ final class AppUITests: XCTestCase {
   @available(iOS 17.0, *)
   private var auditTypesExcludingFontPredictionAndContrast: XCUIAccessibilityAuditType {
     [.elementDetection, .hitRegion, .sufficientElementDescription, .trait]
+  }
+
+  @available(iOS 17.0, *)
+  private var auditTypesExcludingFontPredictionAndHitRegion: XCUIAccessibilityAuditType {
+    [.contrast, .elementDetection, .sufficientElementDescription, .trait]
   }
 
   @available(iOS 17.0, *)

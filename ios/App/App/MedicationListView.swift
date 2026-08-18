@@ -41,7 +41,7 @@ struct MedicationListView: View {
           }
         }
       }
-      .background(Color(uiColor: .systemBackground))
+      .background(AppTheme.dialogBackground)
       .toolbar(.hidden, for: .navigationBar)
       .navigationDestination(for: String.self) { medicationID in
         MedicationDetailView(medicationID: medicationID)
