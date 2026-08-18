@@ -4,7 +4,7 @@ The app is implemented natively in SwiftUI for iPhone and iPad. Medication data 
 
 ## Submission status
 
-Version 1.0 build 1 was submitted to Apple App Review on 2026-08-18 at 11:28 PDT and is **Waiting for Review**. Apple confirmed that one item was submitted. Release is configured as **manual**, so approval will not publish the app until the account holder explicitly releases it.
+Version 1.0 build 1 was submitted to Apple App Review on 2026-08-18 at 11:28 PDT and is **Waiting for Review**. Apple confirmed that one item was submitted. Release is configured as **automatic**, so Apple may publish the app after approval without a separate manual release action.
 
 ## What is already complete
 
