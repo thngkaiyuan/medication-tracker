@@ -60,7 +60,7 @@ In Xcode:
 - Export compliance: answer that the app does not use encryption. It does not implement or invoke encryption algorithms.
 - Price: `Free` (recommended; confirm before submission)
 - Availability: confirm the desired countries/regions
-- Age rating: complete Apple's current questionnaire accurately; the app contains no objectionable content, user-generated content, or unrestricted web access.
+- Age rating: `4+`. All questionnaire content/capability values are `None` or `No`; MedTracker is a blank-slate private timing and logging utility and provides no diagnosis, treatment, dosage, or medical-safety guidance.
 - Medical declaration: this is a personal record-keeping tool, not a regulated medical device, and it does not diagnose, prescribe, calculate a dose, or provide medical advice.
 - Content rights: `No, this app does not contain, show, or access third-party content.`
 - EU DSA: declare the account's trader/non-trader status in App Store Connect; this is an account/legal choice and cannot be inferred from the code.

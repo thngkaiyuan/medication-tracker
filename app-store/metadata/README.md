@@ -17,6 +17,7 @@ The `en-US` files contain copy-ready values for App Store Connect. They are deli
 - Third-party content: `No`
 - Demo account required: `No`
 - Regulated medical device: `No`
+- Age rating: `4+` (all content/capability questionnaire values `None` or `No`; no override)
 - Encryption: the binary declares `ITSAppUsesNonExemptEncryption = false`
 
 ## Verified limits
