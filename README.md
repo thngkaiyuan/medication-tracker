@@ -80,6 +80,8 @@ Choose the **App** scheme and an iPhone or iPad destination. Native tests live i
 
 See [APP_STORE_SUBMISSION.md](APP_STORE_SUBMISSION.md) for signing, device verification, privacy, and App Store Connect instructions.
 
+Post-1.0 ideas are tracked in [ROADMAP.md](ROADMAP.md). The roadmap prioritizes optional local notifications and glanceable system widgets while preserving MedTracker's focused, offline-first design.
+
 ## How to Use
 
 ### Main Screen
