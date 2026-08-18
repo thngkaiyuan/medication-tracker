@@ -8,7 +8,7 @@ The app is implemented natively in SwiftUI for iPhone and iPad. Medication data 
 - PWA-compatible JSON import/export through the native document picker and share sheet.
 - Local persistence in Application Support and a privacy manifest declaring no collected data.
 - Automated unit, lifecycle, persistence, export, large-text, accessibility, Dark Mode, and portrait/landscape coverage on iPhone and iPad.
-- Release static analysis and an unsigned Release archive validation.
+- Release static analysis, signed archive validation, and an App Store upload preflight.
 - Privacy-safe screenshots under `app-store/screenshots`; all names and records are generated samples.
 
 ## Human prerequisites
@@ -25,8 +25,9 @@ This project is already built with Xcode 26 and the iOS 26 SDK, satisfying Apple
 ## Pre-submission blockers
 
 - The support URL is public and returns HTTP 200.
-- The privacy policy exists at `public/privacy.html`, is included in the production build, and is ready for GitHub Pages. The proposed public URL currently returns HTTP 404 because the iOS/PWA work is still on the local `codex/ios-app` branch rather than deployed from `main`. Merge/push the work, enable GitHub Pages with **GitHub Actions** as its source if needed, and verify the URL returns HTTP 200 before entering it in App Store Connect.
-- A paid Apple Developer Program team must be active before a distribution-signed archive can be uploaded.
+- The privacy policy exists at `public/privacy.html`, is included in the production build, and is ready for GitHub Pages. The proposed public URL still returns HTTP 404 because `codex/ios-app` has not been merged into and deployed from `main`. After explicit merge approval, enable GitHub Pages with **GitHub Actions** as its source if needed and verify the URL returns HTTP 200 before submission.
+- The paid Apple Developer Program membership is active. Xcode recognizes team `J3U6VV2679` as an App Store Connect team and has registered `com.kaiyuan.medicationtracker`.
+- App Store upload preflight currently stops only because the App Store Connect app record has not yet been created. Create the iOS record with name `MedTracker`, bundle ID `com.kaiyuan.medicationtracker`, and SKU `medtracker-ios-001`, then repeat the archive export/upload.
 
 ## Build and device verification
 
