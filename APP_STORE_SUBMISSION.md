@@ -25,11 +25,11 @@ This project is already built with Xcode 26 and the iOS 26 SDK, satisfying Apple
 ## Pre-submission blockers
 
 - The support URL is public and returns HTTP 200.
-- The privacy policy exists at `public/privacy.html`, is included in the production build, and is ready for GitHub Pages. The proposed public URL still returns HTTP 404 because `codex/ios-app` has not been merged into and deployed from `main`. After explicit merge approval, enable GitHub Pages with **GitHub Actions** as its source if needed and verify the URL returns HTTP 200 before submission.
+- The privacy policy exists at `public/privacy.html`. An identical root copy was added to `main`, and `https://thngkaiyuan.github.io/medication-tracker/privacy.html` has been verified live with HTTP 200.
 - The paid Apple Developer Program membership is active. Xcode recognizes team `J3U6VV2679` as an App Store Connect team and has registered `com.kaiyuan.medicationtracker`.
 - App Store Connect record `6802761446` exists as `MedTracker: Private Dose Log`, and version 1.0 build 1 has been uploaded for processing.
 - The account holder must accept Apple's updated Developer Program License Agreement before submission.
-- Before submission, install and test the exact release candidate on the owner's physical iPhone. Freeze and submit only after the owner explicitly approves that build.
+- Version 1.0 build 1 was installed and approved on the owner's physical iPhone 17 Pro. The tested source is frozen at tag `ios-v1.0-build1-approved` (`b84ac75`). Any release-code change requires another physical-device test and approval.
 
 ## Build and device verification
 
@@ -59,8 +59,9 @@ In Xcode:
 - App Privacy: select **Data Not Collected**; the app has no tracking, analytics, ads, accounts, or remote data transmission.
 - App Accessibility: indicate **Differentiate Without Color Alone** for iPhone and iPad. Medication status is always stated in text as well as represented by color. Leave other features unclaimed until they complete Apple's prescribed testing.
 - Export compliance: answer that the app does not use encryption. It does not implement or invoke encryption algorithms.
-- Price: `Free` (recommended; confirm before submission)
-- Availability: confirm the desired countries/regions
+- Price: `Free` (saved in App Store Connect)
+- Availability: all 175 countries or regions on app release (saved in App Store Connect)
+- Device distribution: iPhone and iPad only. Apple Silicon Mac and Apple Vision Pro availability are disabled. iPhone and iPad have automated/simulator coverage; the iPhone 17 Pro is the physically tested and owner-approved device.
 - Age rating: `4+`. All questionnaire content/capability values are `None` or `No`; MedTracker is a blank-slate private timing and logging utility and provides no diagnosis, treatment, dosage, or medical-safety guidance.
 - Medical declaration: this is a personal record-keeping tool, not a regulated medical device, and it does not diagnose, prescribe, calculate a dose, or provide medical advice.
 - Content rights: `No, this app does not contain, show, or access third-party content.`

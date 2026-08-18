@@ -4,13 +4,15 @@ The `en-US` files contain copy-ready values for App Store Connect. They are deli
 
 ## Recommended nonlocalized values
 
-- Name: `MedTracker` (confirm availability)
+- Name: `MedTracker: Private Dose Log`
 - Bundle ID: `com.kaiyuan.medicationtracker`
 - SKU: `medtracker-ios-001`
 - Version: `1.0`
 - Primary category: `Medical`
 - Secondary category: `Health & Fitness`
-- Price: `Free` (confirm with the account holder)
+- Price: `Free`
+- Availability: all 175 App Store countries or regions on app release
+- Device distribution: iPhone and iPad only; Apple Silicon Mac and Apple Vision Pro availability are disabled
 - Copyright: `2026 Positive` (owner-requested brand; App Store acceptance is subject to Apple)
 - Marketing URL: `https://github.com/thngkaiyuan/medication-tracker`
 - Privacy: `Data Not Collected`
