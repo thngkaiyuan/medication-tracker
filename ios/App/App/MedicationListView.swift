@@ -3,6 +3,7 @@ import UniformTypeIdentifiers
 
 struct MedicationListView: View {
   @EnvironmentObject private var store: MedicationStore
+  @EnvironmentObject private var notificationManager: NotificationManager
   @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
   @State private var navigationPath: [String] = []
@@ -11,6 +12,7 @@ struct MedicationListView: View {
   @State private var showingImporter = false
   @State private var showingImportConfirmation = false
   @State private var showingAbout = false
+  @State private var showingNotifications = false
   @State private var pendingImport: [Medication]?
   @State private var shareItem: BackupShareItem?
   @State private var lastSharedBackupURL: URL?
@@ -71,6 +73,11 @@ struct MedicationListView: View {
     }
     .sheet(isPresented: $showingAbout) {
       AboutView()
+    }
+    .sheet(isPresented: $showingNotifications) {
+      NotificationSettingsView()
+        .environmentObject(store)
+        .environmentObject(notificationManager)
     }
     .fileImporter(
       isPresented: $showingImporter,
@@ -222,6 +229,12 @@ struct MedicationListView: View {
         }
 
         Divider()
+
+        Button {
+          showingNotifications = true
+        } label: {
+          Label("Configure Notifications", systemImage: "bell")
+        }
 
         Button {
           showingAbout = true

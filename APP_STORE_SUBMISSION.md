@@ -4,7 +4,7 @@ The app is implemented natively in SwiftUI for iPhone and iPad. Medication data 
 
 ## Submission status
 
-Version 1.0 build 1 was submitted to Apple App Review on 2026-08-18 at 11:28 PDT. On 2026-08-19, Apple marked it **Rejected — Information Needed** under Guideline 2.1 and requested a physical-device screen recording plus seven informational responses. Apple did not identify a code defect. The response draft and recording runbook are in `app-review/APP_REVIEW_RESPONSE.md`. Release remains configured as **automatic** after approval.
+Version 1.0 build 1 completed its initial App Review cycle. Version 1.0.1 build 2 is the approved release candidate: it adds optional local Ready Notifications, refreshes the PWA-matched status palette, and updates the App Store preview and screenshot story. Release remains configured as **automatic** after approval.
 
 ## What is already complete
 
@@ -13,7 +13,7 @@ Version 1.0 build 1 was submitted to Apple App Review on 2026-08-18 at 11:28 PDT
 - Local persistence in Application Support and a privacy manifest declaring no collected data.
 - Automated unit, lifecycle, persistence, export, large-text, accessibility, Dark Mode, and portrait/landscape coverage on iPhone and iPad.
 - Release static analysis, signed archive validation, and a successful App Store Connect upload of version 1.0 build 1.
-- Privacy-safe screenshots under `app-store/screenshots`; all names and records are generated samples. Three iPhone 6.9-inch and three iPad 13-inch screenshots were uploaded to App Store Connect.
+- Privacy-safe screenshots under `app-store/screenshots`; all names and records are generated samples. Seven iPhone 6.9-inch and seven iPad 13-inch screenshots are prepared in chronological story order, along with a narrated iPhone app preview.
 
 ## Human prerequisites
 
@@ -31,9 +31,9 @@ This project is already built with Xcode 26 and the iOS 26 SDK, satisfying Apple
 - The support URL is public and returns HTTP 200.
 - The privacy policy exists at `public/privacy.html`. An identical root copy was added to `main`, and `https://thngkaiyuan.github.io/medication-tracker/privacy.html` has been verified live with HTTP 200.
 - The paid Apple Developer Program membership is active. Xcode recognizes team `J3U6VV2679` as an App Store Connect team and has registered `com.kaiyuan.medicationtracker`.
-- App Store Connect record `6802761446` exists as `MedTracker: Private Dose Log`, and version 1.0 build 1 has been uploaded for processing.
+- App Store Connect record `6802761446` exists as `MedTracker: Private Dose Log`.
 - App Store Connect accepted the submission without an outstanding agreement blocker.
-- Version 1.0 build 1 was installed and approved on the owner's physical iPhone 17 Pro. The tested source is frozen at tag `ios-v1.0-build1-approved` (`b84ac75`). Any release-code change requires another physical-device test and approval.
+- Version 1.0.1 build 2 was installed and approved on the owner's physical iPhone 17 Pro before the listing-media upload. Any later release-code change requires another physical-device test and approval.
 
 ## Build and device verification
 
@@ -54,7 +54,7 @@ In Xcode:
 - Primary category: `Medical`
 - Secondary category: `Health & Fitness`
 - Bundle ID: `com.kaiyuan.medicationtracker`
-- Version: `1.0`
+- Version: `1.0.1` (build 2)
 - SKU suggestion: `medtracker-ios-001`
 - Support URL: `https://github.com/thngkaiyuan/medication-tracker/issues`
 - Marketing URL: `https://github.com/thngkaiyuan/medication-tracker`
@@ -92,7 +92,7 @@ Review notes:
 5. In Organizer choose **Distribute App → App Store Connect → Upload**.
 6. Attach the uploaded build in App Store Connect and complete app privacy, age rating, content rights, encryption, medical-device, and review-contact questions.
 7. Install and test the exact release candidate on the owner's physical iPhone, record the approved commit/build, and make no further release changes without repeating that test.
-8. Only after the owner explicitly approves the frozen build, submit it for review. Completed for version 1.0 build 1 on 2026-08-18.
+8. Only after the owner explicitly approves the frozen build and listing media, submit it for review. Approval for version 1.0.1 build 2 and its listing package was given on 2026-08-25.
 
 ## Exact handoff when the owner returns
 

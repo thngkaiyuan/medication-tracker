@@ -117,4 +117,52 @@ final class MedicationTests: XCTestCase {
 
     XCTAssertEqual(medication.dosesInLast24Hours(at: now), 1)
   }
+
+  func testNotificationPlannerSchedulesOnlyWaitingMedications() throws {
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    let waiting = Medication(
+      id: "waiting",
+      name: "Acetaminophen",
+      timeBetweenHours: 6,
+      records: [now.addingTimeInterval(-3_600).timeIntervalSince1970 * 1_000]
+    )
+    let ready = Medication(
+      id: "ready",
+      name: "Cetirizine",
+      timeBetweenHours: 4
+    )
+
+    let notifications = MedicationNotificationPlanner.notifications(
+      for: [waiting, ready],
+      at: now
+    )
+
+    XCTAssertEqual(notifications.count, 1)
+    XCTAssertEqual(notifications[0].identifier, "medtracker.ready.waiting")
+    XCTAssertEqual(notifications[0].title, "Acetaminophen: wait limits cleared")
+    XCTAssertEqual(notifications[0].body, "Ready based on the limits you entered.")
+    XCTAssertEqual(notifications[0].date, now.addingTimeInterval(5 * 3_600))
+  }
+
+  func testNotificationPlannerUsesRollingDailyLimitWhenItClearsLater() throws {
+    let now = Date(timeIntervalSince1970: 1_800_000_000)
+    let firstDose = now.addingTimeInterval(-5 * 3_600)
+    let latestDose = now.addingTimeInterval(-3_600)
+    let medication = Medication(
+      id: "daily-limit",
+      name: "Ibuprofen",
+      timeBetweenHours: 4,
+      maxDosesPerDay: 2,
+      records: [
+        firstDose.timeIntervalSince1970 * 1_000,
+        latestDose.timeIntervalSince1970 * 1_000,
+      ]
+    )
+
+    let notification = try XCTUnwrap(
+      MedicationNotificationPlanner.notifications(for: [medication], at: now).first
+    )
+
+    XCTAssertEqual(notification.date, firstDose.addingTimeInterval(24 * 3_600))
+  }
 }

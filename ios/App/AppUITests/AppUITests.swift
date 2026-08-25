@@ -142,13 +142,21 @@ final class AppUITests: XCTestCase {
   }
 
   func testCaptureAppStoreScreenshots() throws {
-    let medicationName = "Morning Medication"
+    let medicationName = "Acetaminophen"
     let app = testApplication()
     app.launchEnvironment["UITEST_APP_STORE_FIXTURE"] = "1"
     app.launch()
 
-    XCTAssertTrue(element(containing: medicationName, in: app).waitForExistence(timeout: 10))
+    let medicationCard = element(containing: medicationName, in: app)
+    XCTAssertTrue(medicationCard.waitForExistence(timeout: 10))
+    XCTAssertEqual(medicationCard.frame.height, 128, accuracy: 1)
     attachScreenshot(named: "app-store-01-home")
+
+    app.buttons["More options"].tap()
+    XCTAssertTrue(exactButton("Configure Notifications", in: app).waitForExistence(timeout: 5))
+    attachScreenshot(named: "revision-preview-menu")
+    app.coordinate(withNormalizedOffset: CGVector(dx: 0.82, dy: 0.72)).tap()
+    XCTAssertFalse(exactButton("Configure Notifications", in: app).exists)
 
     openMedicationActions(named: medicationName, in: app, expecting: "View Records")
     attachScreenshot(named: "app-store-02-actions")
@@ -157,6 +165,142 @@ final class AppUITests: XCTestCase {
     XCTAssertTrue(app.staticTexts["3."].waitForExistence(timeout: 10))
     XCTAssertTrue(app.staticTexts["3."].isHittable)
     attachScreenshot(named: "app-store-03-history")
+  }
+
+  func testCaptureExpandedAppStoreScreenshots() throws {
+    let app = testApplication()
+    app.launchEnvironment["UITEST_APP_STORE_FIXTURE"] = "1"
+    app.launch()
+
+    XCTAssertTrue(element(containing: "Acetaminophen", in: app).waitForExistence(timeout: 10))
+
+    button(containing: "Add Medication", in: app).tap()
+    XCTAssertTrue(app.textFields["Medication Name"].waitForExistence(timeout: 5))
+    attachScreenshot(named: "app-store-04-add-medication")
+    exactButton("Cancel", in: app).tap()
+
+    app.buttons["More options"].tap()
+    XCTAssertTrue(exactButton("Configure Notifications", in: app).waitForExistence(timeout: 5))
+    exactButton("Configure Notifications", in: app).tap()
+    XCTAssertTrue(app.staticTexts["Notifications"].waitForExistence(timeout: 5))
+    attachScreenshot(named: "app-store-05-notifications")
+    exactButton("Done", in: app).tap()
+
+    app.buttons["More options"].tap()
+    XCTAssertTrue(exactButton("Privacy & About", in: app).waitForExistence(timeout: 5))
+    exactButton("Privacy & About", in: app).tap()
+    XCTAssertTrue(app.staticTexts["Privacy & About"].waitForExistence(timeout: 5))
+    attachScreenshot(named: "app-store-06-privacy")
+    exactButton("Done", in: app).tap()
+
+    app.buttons["More options"].tap()
+    XCTAssertTrue(exactButton("Export Backup", in: app).waitForExistence(timeout: 5))
+    exactButton("Export Backup", in: app).tap()
+    XCTAssertTrue(app.otherElements["ActivityListView"].waitForExistence(timeout: 10))
+    Thread.sleep(forTimeInterval: 1)
+    attachScreenshot(named: "app-store-07-backup-share")
+  }
+
+  func testRecordAppStorePreviewStory() throws {
+    let medicationName = "Acetaminophen"
+    let app = testApplication()
+    app.launchEnvironment["UITEST_APP_PREVIEW_FIXTURE"] = "1"
+    app.launch()
+
+    XCTAssertTrue(element(containing: medicationName, in: app).waitForExistence(timeout: 10))
+    let threeSecondCountdown = app.staticTexts.matching(
+      NSPredicate(format: "label CONTAINS %@", "Wait limits clear in 3s")
+    ).firstMatch
+    XCTAssertTrue(threeSecondCountdown.waitForExistence(timeout: 10))
+    Thread.sleep(forTimeInterval: 4)
+    XCTAssertTrue(
+      app.staticTexts["Ready based on your limits"].waitForExistence(timeout: 3)
+    )
+    Thread.sleep(forTimeInterval: 1)
+
+    openMedicationActions(named: medicationName, in: app, expecting: "Log Dose")
+    Thread.sleep(forTimeInterval: 1)
+    exactButton("Log Dose", in: app).tap()
+    XCTAssertTrue(
+      element(containing: medicationName, in: app).label.contains("Wait limits clear in")
+    )
+    Thread.sleep(forTimeInterval: 2)
+
+    openMedicationActions(named: medicationName, in: app, expecting: "View Records")
+    exactButton("View Records", in: app).tap()
+    XCTAssertTrue(app.staticTexts["2."].waitForExistence(timeout: 5))
+    XCTAssertTrue(app.staticTexts["2."].isHittable)
+    Thread.sleep(forTimeInterval: 3)
+
+    app.buttons["Back"].tap()
+    XCTAssertTrue(app.buttons["More options"].waitForExistence(timeout: 5))
+    app.buttons["More options"].tap()
+    XCTAssertTrue(exactButton("Privacy & About", in: app).waitForExistence(timeout: 5))
+    exactButton("Privacy & About", in: app).tap()
+    XCTAssertTrue(app.staticTexts["Privacy & About"].waitForExistence(timeout: 5))
+    Thread.sleep(forTimeInterval: 3)
+    exactButton("Done", in: app).tap()
+
+    app.buttons["More options"].tap()
+    XCTAssertTrue(exactButton("Import Backup", in: app).waitForExistence(timeout: 5))
+    XCTAssertTrue(exactButton("Export Backup", in: app).exists)
+    Thread.sleep(forTimeInterval: 2)
+    exactButton("Export Backup", in: app).tap()
+    XCTAssertTrue(app.otherElements["ActivityListView"].waitForExistence(timeout: 10))
+    Thread.sleep(forTimeInterval: 3)
+
+    let closeShareSheet = app.buttons["Close"]
+    if closeShareSheet.waitForExistence(timeout: 2) {
+      closeShareSheet.tap()
+    } else {
+      app.coordinate(withNormalizedOffset: CGVector(dx: 0.90, dy: 0.13)).tap()
+    }
+    XCTAssertTrue(element(containing: medicationName, in: app).waitForExistence(timeout: 5))
+    Thread.sleep(forTimeInterval: 3)
+  }
+
+  func testCaptureNotificationPreview() throws {
+    let app = testApplication()
+    app.launchEnvironment["UITEST_NOTIFICATION_FIXTURE"] = "1"
+    app.launchEnvironment["UITEST_RESET_NOTIFICATION_PREFERENCE"] = "1"
+    app.launch()
+
+    XCTAssertTrue(element(containing: "Acetaminophen", in: app).waitForExistence(timeout: 10))
+    app.buttons["More options"].tap()
+    XCTAssertTrue(exactButton("Configure Notifications", in: app).waitForExistence(timeout: 5))
+    exactButton("Configure Notifications", in: app).tap()
+
+    XCTAssertTrue(app.staticTexts["Notifications"].waitForExistence(timeout: 5))
+    XCTAssertTrue(app.switches["Ready Notifications Toggle"].waitForExistence(timeout: 5))
+    attachScreenshot(named: "notification-settings")
+
+    app.switches["Ready Notifications Toggle"]
+      .coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5))
+      .tap()
+    Thread.sleep(forTimeInterval: 2)
+    attachScreenshot(named: "notification-permission")
+
+    app.coordinate(withNormalizedOffset: CGVector(dx: 0.67, dy: 0.63)).tap()
+
+    let notificationsToggle = app.switches["Ready Notifications Toggle"]
+    let enabled = NSPredicate(format: "value == '1'")
+    expectation(for: enabled, evaluatedWith: notificationsToggle)
+    waitForExpectations(timeout: 5)
+    exactButton("Done", in: app).tap()
+    XCUIDevice.shared.press(.home)
+    Thread.sleep(forTimeInterval: 32)
+    attachScreenshot(named: "notification-delivered")
+
+    let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+    let topEdge = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01))
+    let lowerScreen = springboard.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.8))
+    topEdge.press(forDuration: 0.1, thenDragTo: lowerScreen)
+
+    let deliveredTitle = springboard.staticTexts.matching(
+      NSPredicate(format: "label CONTAINS %@", "Acetaminophen: wait limits cleared")
+    ).firstMatch
+    XCTAssertTrue(deliveredTitle.waitForExistence(timeout: 5))
+    attachScreenshot(named: "notification-center")
   }
 
   @available(iOS 17.0, *)

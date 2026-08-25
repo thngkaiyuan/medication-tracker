@@ -2,7 +2,7 @@
 
 MedTracker remains deliberately focused on private medication tracking. Broader cooldown or desire-control use cases may share ideas with the app, but they should not dilute its medication-specific purpose, language, or interface.
 
-Version 1.0 build 1 is frozen and submitted to Apple. The items below are candidates for later releases, not changes to the submitted build.
+Version 1.0 build 1 is frozen. Version 1.0.1 adds the first roadmap priority—optional local notifications—and refreshes the status palette. The remaining items below are candidates for later releases.
 
 ## Product principles
 
@@ -15,29 +15,29 @@ Version 1.0 build 1 is frozen and submitted to Apple. The items below are candid
 
 ## Priorities
 
-### 1. Optional local notifications when entered limits clear
+### Delivered in 1.0.1: Optional local notifications when entered limits clear
 
-Highest priority. Users should not need to remember when they last logged a dose, maintain a mental countdown, or repeatedly reopen the app.
+Users no longer need to remember when they last logged a dose, maintain a mental countdown, or repeatedly reopen the app just to know when their entered limits clear.
 
-Proposed behavior:
+Delivered behavior:
 
-- Offer an opt-in notification for each medication.
+- Offer an opt-in global Ready Notifications setting.
 - Schedule it locally for the time when both the entered minimum interval and optional rolling 24-hour limit clear.
 - Recalculate notifications after logging, editing, or deleting a dose and after editing a medication's limits.
 - Work without an account, server, analytics, or internet connection.
-- Use careful wording such as `Entered limits have cleared for Ibuprofen`, never `Safe to take` or `Dose due`.
+- Use careful wording such as `Ibuprofen: wait limits cleared`, never `Safe to take` or `Dose due`.
 - Explain that notification delivery time is controlled by iOS and may not be exact.
 - Provide a simple global notification setting without adding clutter to the main screen.
 
-Acceptance considerations:
+Implemented safeguards and coverage:
 
 - Permission is requested only in context, after the user enables notifications.
 - Editing records cannot leave stale notifications scheduled.
 - Time-zone and daylight-saving changes are handled correctly.
-- Notification content can be hidden or made generic for privacy.
-- Unit and UI tests cover scheduling, rescheduling, cancellation, and disabled-permission behavior.
+- The settings screen discloses that medication names can appear on the Lock Screen and points users to iOS notification-preview settings.
+- Unit and UI tests cover scheduling logic, permission timing, delivery, and the settings flow.
 
-### 2. Glanceable widget and fast system actions
+### 1. Glanceable widget and fast system actions
 
 Second priority. Opening the app currently requires finding its Home Screen location and tapping through, which is meaningful friction during a migraine or other pain episode.
 
@@ -51,7 +51,7 @@ Explore:
 
 The widget must retain the app's calm visual hierarchy, textual status, and conservative safety language. It should not imply that green means medically safe.
 
-### 3. Quantity-aware records and configurable rolling limits
+### 2. Quantity-aware records and configurable rolling limits
 
 Useful for people whose meaning of one dose varies, but lower priority because many users already treat each medication's dose as a known unit.
 
@@ -64,11 +64,11 @@ Potential scope:
 
 This should proceed only with a migration design that preserves every existing record and keeps one-tap logging simple for users who do not need quantities.
 
-### 4. Brief Undo after logging
+### 3. Brief Undo after logging
 
 Lower priority because the current action dialog already makes accidental logging uncommon. A short-lived `Dose recorded · Undo` affordance could still make recovery faster without adding a persistent control.
 
-### 5. Carefully selected history insights
+### 4. Carefully selected history insights
 
 Optional and intentionally constrained. Possible examples include totals over time or average intervals, but insights must not crowd the core experience or introduce adherence scores, streak pressure, or medical interpretation.
 
@@ -78,4 +78,3 @@ Optional and intentionally constrained. Possible examples include totals over ti
 - Medical advice, dose recommendations, or claims that another dose is safe.
 - Social features, advertising, engagement mechanics, or streak gamification.
 - Requiring an account or network connection for core functionality.
-

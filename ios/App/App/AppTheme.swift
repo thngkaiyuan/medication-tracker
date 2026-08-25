@@ -21,8 +21,12 @@ enum AppTheme {
     light: .systemBackground,
     dark: .secondarySystemBackground
   )
-  static let readyStart = Color(red: 46 / 255, green: 125 / 255, blue: 50 / 255)
-  static let readyEnd = readyStart
+  private static let recentRGB = (red: 230.0, green: 81.0, blue: 0.0)
+  private static let readyStartRGB = (red: 46.0, green: 125.0, blue: 50.0)
+  private static let readyEndRGB = (red: 76.0, green: 175.0, blue: 80.0)
+
+  static let readyStart = color(from: readyStartRGB)
+  static let readyEnd = color(from: readyEndRGB)
 
   static func statusColors(for medication: Medication, at date: Date = .now) -> [Color] {
     if medication.isReady(at: date) {
@@ -30,11 +34,30 @@ enum AppTheme {
     }
 
     let progress = medication.progress(at: date)
-    let red = (180 + (46 - 180) * progress) / 255
-    let green = (79 + (125 - 79) * progress) / 255
-    let blue = (0 + (50 - 0) * progress) / 255
-    let base = Color(red: red, green: green, blue: blue)
+    let base = color(interpolatingFrom: recentRGB, to: readyStartRGB, progress: progress)
     return [base, base]
+  }
+
+  private static func color(
+    interpolatingFrom start: (red: Double, green: Double, blue: Double),
+    to end: (red: Double, green: Double, blue: Double),
+    progress: Double
+  ) -> Color {
+    color(from: (
+      red: start.red + ((end.red - start.red) * progress),
+      green: start.green + ((end.green - start.green) * progress),
+      blue: start.blue + ((end.blue - start.blue) * progress)
+    ))
+  }
+
+  private static func color(
+    from components: (red: Double, green: Double, blue: Double)
+  ) -> Color {
+    Color(
+      red: components.red / 255,
+      green: components.green / 255,
+      blue: components.blue / 255
+    )
   }
 
   private static func adaptive(light: UIColor, dark: UIColor) -> Color {

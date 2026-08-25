@@ -8,36 +8,51 @@ struct MedicationCard: View {
   private var statusText: String {
     let remaining = medication.timeUntilNextDose(at: now)
     return remaining == 0
-      ? "Entered wait limits cleared"
+      ? "Ready based on your limits"
       : "Wait limits clear in \(remaining.conciseDuration)"
   }
 
   private var lastDoseText: String {
-    guard let lastDose = medication.lastDoseDate else { return "No doses recorded" }
-    return "Last \(lastDose.formatted(date: .abbreviated, time: .shortened))"
+    guard let lastDose = medication.lastDoseDate else { return "Last: Never" }
+    let formattedDate = lastDose.formatted(
+      .dateTime
+        .weekday(.abbreviated)
+        .month(.abbreviated)
+        .day()
+        .year()
+        .hour()
+        .minute()
+    )
+    return "Last: \(formattedDate)"
   }
 
   var body: some View {
     Button(action: action) {
-      VStack(spacing: 7) {
+      VStack(spacing: 0) {
         Text(medication.name.uppercased())
-          .font(.title2.weight(.light))
+          .font(.system(size: 24, weight: .light))
+          .frame(minHeight: 38.4)
           .multilineTextAlignment(.center)
           .fixedSize(horizontal: false, vertical: true)
 
-        Text(statusText)
-          .font(.system(.subheadline, design: .default, weight: .light))
-          .foregroundStyle(.white)
+        VStack(spacing: 6) {
+          Text(statusText)
+            .font(.system(size: 12, weight: .light))
+            .foregroundStyle(.white.opacity(0.85))
+            .frame(minHeight: 19.2)
 
-        Text(lastDoseText)
-          .font(.system(.caption, design: .default, weight: .light))
-          .foregroundStyle(.white)
+          Text(lastDoseText)
+            .font(.system(size: 10, weight: .light))
+            .foregroundStyle(.white.opacity(0.75))
+            .frame(minHeight: 16)
+        }
+        .padding(.top, 8)
       }
       .foregroundStyle(.white)
       .padding(.horizontal, 16)
       .padding(.vertical, 20)
       .frame(maxWidth: .infinity)
-      .frame(minHeight: 124)
+      .frame(minHeight: 128)
       .background(
         LinearGradient(
           colors: AppTheme.statusColors(for: medication, at: now),

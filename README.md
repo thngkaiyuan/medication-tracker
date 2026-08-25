@@ -42,6 +42,7 @@ The app is designed primarily for mobile touch interaction but is functional on 
 * **Timezone Aware:** Accurately tracks and displays dose times across timezones.
 * **Data Backup & Restore:** Export your data as a JSON file and import it back when needed. Accessed via the "three dots" menu.
 * **Fully Offline:** Track, review, edit, import, and export medication data without an internet connection, including in Airplane Mode.
+* **Optional Ready Notifications (iOS):** Receive an on-device alert when the waiting limits you entered clear, without an account or server.
 * **PWA Installable:** Add to your device's home screen for an app-like experience.
 * **Responsive & Minimalist Design:** Clean, focused, and adapts to different screen sizes.
 
@@ -80,7 +81,7 @@ Choose the **App** scheme and an iPhone or iPad destination. Native tests live i
 
 See [APP_STORE_SUBMISSION.md](APP_STORE_SUBMISSION.md) for signing, device verification, privacy, and App Store Connect instructions.
 
-Post-1.0 ideas are tracked in [ROADMAP.md](ROADMAP.md). The roadmap prioritizes optional local notifications and glanceable system widgets while preserving MedTracker's focused, offline-first design.
+Future ideas are tracked in [ROADMAP.md](ROADMAP.md). With optional local notifications delivered in iOS 1.0.1, the next major exploration is glanceable system widgets and fast actions while preserving MedTracker's focused, offline-first design.
 
 ## How to Use
 
