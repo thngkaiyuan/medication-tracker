@@ -4,7 +4,8 @@ const APP_SHELL = [
   './index.html',
   './assets/app.css',
   './assets/app.js',
-  './manifest.json'
+  './manifest.json',
+  './privacy.html'
 ];
 
 self.addEventListener('install', (event) => {

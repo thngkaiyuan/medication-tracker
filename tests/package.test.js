@@ -4,11 +4,11 @@ import test from 'node:test';
 
 test('production build contains the complete offline app shell', async () => {
     const serviceWorker = await readFile(new URL('../dist/sw.js', import.meta.url), 'utf8');
-    for (const asset of ['./index.html', './assets/app.css', './assets/app.js', './manifest.json']) {
+    for (const asset of ['./index.html', './assets/app.css', './assets/app.js', './manifest.json', './privacy.html']) {
         assert.match(serviceWorker, new RegExp(asset.replace(/[./]/g, '\\$&')));
     }
 
-    for (const path of ['../dist/index.html', '../dist/assets/app.css', '../dist/assets/app.js', '../dist/manifest.json']) {
+    for (const path of ['../dist/index.html', '../dist/assets/app.css', '../dist/assets/app.js', '../dist/manifest.json', '../dist/privacy.html']) {
         assert.ok((await stat(new URL(path, import.meta.url))).size > 0, `${path} should not be empty`);
     }
 });

@@ -29,7 +29,7 @@ This project is already built with Xcode 26 and the iOS 26 SDK, satisfying Apple
 ## Pre-submission blockers
 
 - The support URL is public and returns HTTP 200.
-- The privacy policy exists at `public/privacy.html`. An identical root copy was added to `main`, and `https://thngkaiyuan.github.io/medication-tracker/privacy.html` has been verified live with HTTP 200.
+- The privacy policy has a single canonical source at `public/privacy.html`. Vite copies it to `dist/privacy.html`, which is published at `https://thngkaiyuan.github.io/medication-tracker/privacy.html` by the GitHub Pages workflow.
 - The paid Apple Developer Program membership is active. Xcode recognizes team `J3U6VV2679` as an App Store Connect team and has registered `com.kaiyuan.medicationtracker`.
 - App Store Connect record `6802761446` exists as `MedTracker: Private Dose Log`.
 - App Store Connect accepted the submission without an outstanding agreement blocker.
