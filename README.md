@@ -1,12 +1,16 @@
-# Medication Tracker PWA
+# Medication Tracker
 
-A simple, clean, and modern Progressive Web App (PWA) to help you track your medication intake, view your history, and manage your medication schedule effectively. All data is stored locally in your browser.
+A private, offline medication tracker available as a Progressive Web App and a native SwiftUI app for iPhone and iPad. Data is stored locally on the device.
 
-<img width="970" alt="image" src="https://github.com/user-attachments/assets/cfc4ba22-b1bf-43f7-a92d-7247157d9666" />
+<p align="center">
+  <img width="30%" alt="MedTracker medication overview on iPhone" src="app-store/screenshots/iphone-6.9/01-home.png" />
+  <img width="30%" alt="MedTracker medication action dialog on iPhone" src="app-store/screenshots/iphone-6.9/02-actions.png" />
+  <img width="30%" alt="MedTracker dose history on iPhone" src="app-store/screenshots/iphone-6.9/03-history.png" />
+</p>
 
 **Access the App:** <https://thngkaiyuan.github.io/medication-tracker/>
 
-*(Initial code structure by Claude Sonnet 4. Significantly rewritten, enhanced, and refined by Google's Gemini 2.5 Pro. This README was also drafted with the assistance of Gemini.)*
+*Development history: The original PWA structure was created with Claude Sonnet 4 and substantially refined with Google’s Gemini 2.5 Pro. The native SwiftUI app, cross-platform compatibility hardening, automated coverage, and App Store preparation were developed with OpenAI Codex. Final product decisions and releases are maintained by the repository owner.*
 
 ## Overview
 
@@ -16,7 +20,7 @@ This application provides a user-friendly interface to:
 * View a clear, chronologically sorted history of when each medication was taken, with newest entries auto-scrolled into view.
 * Edit or delete individual past record entries.
 * Add historical/manual dose records.
-* Visually see when it's safe to take your next dose with color-coded tiles.
+* See at a glance when your entered minimum interval and optional rolling 24-hour limit have cleared, using color-coded tiles.
 * Manage your medication data through local export and import for backup.
 
 The app is designed primarily for mobile touch interaction but is functional on desktop browsers as well.
@@ -37,6 +41,8 @@ The app is designed primarily for mobile touch interaction but is functional on 
 * **Last Consumed Display:** Main screen tiles show when the medication was last consumed.
 * **Timezone Aware:** Accurately tracks and displays dose times across timezones.
 * **Data Backup & Restore:** Export your data as a JSON file and import it back when needed. Accessed via the "three dots" menu.
+* **Fully Offline:** Track, review, edit, import, and export medication data without an internet connection, including in Airplane Mode.
+* **Optional Ready Notifications (iOS):** Receive an on-device alert when the waiting limits you entered clear, without an account or server.
 * **PWA Installable:** Add to your device's home screen for an app-like experience.
 * **Responsive & Minimalist Design:** Clean, focused, and adapts to different screen sizes.
 
@@ -49,6 +55,33 @@ You can install this app on your Android device for a more native experience:
     2.  Tap the browser's menu (three dots on the top right).
     3.  Tap "Add to Home screen."
     4.  Confirm by tapping "Install" on the prompt. The app icon will be added to your home screen.
+
+## iOS App
+
+The repository includes a native SwiftUI project in `ios/`. It uses Apple-native navigation, forms, sheets, menus, file importing, and sharing. Medication data is persisted in Application Support, so every tracking feature works without a network connection.
+
+The native app and PWA intentionally use the same JSON backup schema. A backup exported by either version can be imported by the other.
+
+### Local development
+
+```sh
+npm ci
+npm run dev
+```
+
+### Open the iOS project
+
+Full Xcode is required. Open the project directly or run:
+
+```sh
+npm run ios:open
+```
+
+Choose the **App** scheme and an iPhone or iPad destination. Native tests live in the `AppTests` and `AppUITests` targets.
+
+See [APP_STORE_SUBMISSION.md](APP_STORE_SUBMISSION.md) for signing, device verification, privacy, and App Store Connect instructions.
+
+Future ideas are tracked in [ROADMAP.md](ROADMAP.md). With optional local notifications delivered in iOS 1.0.1, the next major exploration is glanceable system widgets and fast actions while preserving MedTracker's focused, offline-first design.
 
 ## How to Use
 

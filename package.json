@@ -1,0 +1,17 @@
+{
+  "name": "medication-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline-first medication tracker for the web with a native SwiftUI iOS app.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "ios:open": "open ios/App/App.xcodeproj",
+    "test": "npm run build && node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}

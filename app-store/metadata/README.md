@@ -1,0 +1,42 @@
+# App Store metadata
+
+The `en-US` files contain copy-ready values for App Store Connect. They are deliberately plain text and contain no credentials or account-holder information.
+
+## Recommended nonlocalized values
+
+- Name: `MedTracker: Private Dose Log`
+- Bundle ID: `com.kaiyuan.medicationtracker`
+- SKU: `medtracker-ios-001`
+- Version being prepared: `1.0.1` (build 2)
+- Primary category: `Medical`
+- Secondary category: `Health & Fitness`
+- Price: `Free`
+- Availability: all 175 App Store countries or regions on app release
+- Device distribution: iPhone and iPad only; Apple Silicon Mac and Apple Vision Pro availability are disabled
+- Release method: automatic after App Review approval
+- Release status: version 1.0 build 1 is live; version 1.0.1 build 2 is being prepared and must receive final physical-device approval before submission
+- Copyright: `2026 Positive` (owner-requested brand; App Store acceptance is subject to Apple)
+- Marketing URL: `https://github.com/thngkaiyuan/medication-tracker`
+- Privacy: `Data Not Collected`
+- Accessibility: `Differentiate Without Color Alone` on iPhone and iPad (saved as drafts until Apple permits publication)
+- Third-party content: `No`
+- Demo account required: `No`
+- Regulated medical device: `No`
+- Age rating: `4+` (all content/capability questionnaire values `None` or `No`; no override)
+- Encryption: the binary declares `ITSAppUsesNonExemptEncryption = false`
+
+## Verified limits
+
+- Name: 30 characters maximum
+- Subtitle: 30 characters maximum
+- Promotional text: 170 characters maximum
+- Description: 4,000 characters maximum
+- Keywords: 100 UTF-8 bytes maximum
+
+Run the metadata assertions with:
+
+```sh
+npm test
+```
+
+Do not submit `privacy_url.txt` until that URL returns HTTP 200. App Review contact first name, last name, phone number, and email are required but intentionally excluded because the account holder must provide them.

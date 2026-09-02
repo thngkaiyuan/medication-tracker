@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Medication Tracker</title>
     <meta name="description" content="A simple app to track your medication intake and history.">
     <meta name="theme-color" content="#92A3A7">
@@ -78,13 +78,14 @@
                         <input type="text" id="modalMedicationName" required>
                     </div>
                     <div class="form-group">
-                        <label for="modalTimeBetween">Hours Between Doses</label>
+                        <label for="modalTimeBetween">Minimum Hours Between Doses</label>
                         <input type="number" id="modalTimeBetween" min="1" max="48" value="4" required>
                     </div>
                     <div class="form-group">
-                        <label for="modalMaxDoses">Max Doses Per Day (Optional)</label>
+                        <label for="modalMaxDoses">Maximum Doses in Any 24 Hours (Optional)</label>
                         <input type="number" id="modalMaxDoses" min="1" max="24">
                     </div>
+                    <p class="form-disclaimer">Colors reflect only the minimum interval and rolling 24-hour limit you enter. They do not determine whether a dose is medically safe. Follow the medication label and your clinician’s or pharmacist’s instructions.</p>
                 </div>
                 <div id="deleteConfirmationText">Are you sure you want to delete this medication? This action cannot be undone.</div>
                 <div class="modal-buttons">
@@ -137,6 +138,6 @@
 
     <div class="toast" id="toast"></div>
 
+    <script type="module" src="/script.js"></script>
 </body>
 </html>
-<script src="script.js" defer></script>

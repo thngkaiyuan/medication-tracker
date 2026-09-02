@@ -1,0 +1,13 @@
+MedTracker is a simple, private way to record medication doses and see at a glance when the waiting limits you entered have cleared.
+
+• Set a minimum interval and optional rolling 24-hour limit for each medication
+• Log a dose in a tap
+• See the status shift from red-orange toward green as the wait elapses—red-orange means another dose at that moment would exceed at least one entered limit; green means both entered limits have cleared
+• Optionally receive a local notification when the wait limits you entered clear
+• Review, add, edit, and delete dose-history entries
+• Export and import portable JSON backups
+• Use every tracking feature without an internet connection
+
+Your medication data stays on your device. MedTracker has no accounts, analytics, advertising, or tracking.
+
+Colors reflect only the minimum interval and rolling 24-hour limit you enter. They do not determine whether a dose is medically safe. MedTracker does not diagnose, prescribe, recommend doses, or replace the medication label or advice from your clinician or pharmacist.

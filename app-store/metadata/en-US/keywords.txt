@@ -1,0 +1,1 @@
+medicine,pill,interval,backup,records,as needed,painkiller,tracker,OTC,prescription,countdown,diary

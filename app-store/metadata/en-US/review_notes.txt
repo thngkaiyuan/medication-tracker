@@ -1,0 +1,13 @@
+MedTracker is a personal record-keeping tool and does not diagnose, prescribe, recommend doses, or provide medical advice. No account is required, no demo credentials are needed, and all tracking functionality works offline.
+
+Color methodology: each medication tile progresses from red-orange toward green as its waiting period elapses. The wait clears only after both (1) the user-entered minimum interval since the latest logged dose and (2) the optional user-entered maximum for any rolling 24-hour period. The app performs no drug-specific calculation and explicitly tells users that the colors do not determine whether a dose is medically safe; users must follow the medication label and their clinician or pharmacist.
+
+Version 1.0.1 adds optional local Ready Notifications. To test them, open the ellipsis menu, choose Configure Notifications, and enable “Notify when wait limits clear.” iOS asks for notification permission only after the user enables this setting. Alerts are calculated and scheduled entirely on the device from the limits the user entered; they are not medical recommendations. Medication names can appear in alerts, as disclosed on the settings screen.
+
+To exercise the core flow:
+1. Tap Add Medication and save a medication.
+2. Tap its full-width card.
+3. Choose Log Dose or View Records.
+4. Use the pencil and ellipsis controls to edit or delete data.
+
+Export Backup opens the native iOS share sheet. Import Backup accepts a compatible JSON backup selected by the reviewer through the native document picker. The app does not transmit medication data or contact a developer-operated service.

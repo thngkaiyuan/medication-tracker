@@ -1,3 +1,5 @@
+import { getMedicationTiming, parseMedicationBackup } from './data.js';
+
 class MedicationTracker {
             constructor() {
                 this.dom = {
@@ -48,7 +50,7 @@ class MedicationTracker {
                     deleteRecordEntryBtn: document.getElementById('deleteRecordEntryBtn')
                 };
 
-                this.medications = JSON.parse(localStorage.getItem('medications') || '[]');
+                this.medications = this.loadMedications();
                 this.currentRecordsMedication = null;
                 this.editingMedicationId = null;
                 this.confirmingDeleteMedication = false;
@@ -128,8 +130,8 @@ class MedicationTracker {
                     e.stopPropagation();
                     this.toggleOptionsMenu();
                 });
-                this.dom.exportDataMenuBtn.addEventListener('click', () => {
-                    this.exportData();
+                this.dom.exportDataMenuBtn.addEventListener('click', async () => {
+                    await this.exportData();
                     this.toggleOptionsMenu(false);
                 });
                 this.dom.importDataMenuBtn.addEventListener('click', () => {
@@ -478,17 +480,19 @@ class MedicationTracker {
             }
 
 
-            exportData() {
+            async exportData() {
                 if (this.medications.length === 0) {
                     this.showToast('No data to export.');
                     return;
                 }
                 const jsonData = JSON.stringify(this.medications, null, 2);
+                const fileName = `medication_tracker_backup_${new Date().toISOString().slice(0,10)}.json`;
+
                 const blob = new Blob([jsonData], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `medication_tracker_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.download = fileName;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -505,11 +509,7 @@ class MedicationTracker {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
-                        const importedMedications = JSON.parse(e.target.result);
-                        if (!Array.isArray(importedMedications)) {
-                            throw new Error('Invalid file format: Not an array.');
-                        }
-                        this.medications = importedMedications;
+                        this.medications = parseMedicationBackup(JSON.parse(e.target.result));
                         this.saveAndRender();
                         this.showToast(`Data imported successfully. ${this.medications.length} medication(s) loaded.`);
                     } catch (error) {
@@ -622,15 +622,29 @@ class MedicationTracker {
                     this.dom.recordsContent.innerHTML = '<div class="empty-records">No records yet.</div>';
                 } else {
                     const sortedRecords = [...records].sort((a, b) => a - b); // Sorts oldest to newest
-                    this.dom.recordsContent.innerHTML = sortedRecords.map((timestamp, index) =>
-                        `<div class="record-item" data-timestamp="${timestamp}">
-                            <span class="record-number">${index + 1}.</span>
-                            <span class="record-datetime">${this.formatDateTime(timestamp)}</span>
-                            <button class="record-entry-action-btn" data-timestamp="${timestamp}" aria-label="Edit or Delete Record Entry">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>
-                            </button>
-                        </div>`
-                    ).join('');
+                    const recordElements = sortedRecords.map((timestamp, index) => {
+                        const row = document.createElement('div');
+                        row.className = 'record-item';
+                        row.dataset.timestamp = String(timestamp);
+
+                        const number = document.createElement('span');
+                        number.className = 'record-number';
+                        number.textContent = `${index + 1}.`;
+
+                        const dateTime = document.createElement('span');
+                        dateTime.className = 'record-datetime';
+                        dateTime.textContent = this.formatDateTime(timestamp);
+
+                        const action = document.createElement('button');
+                        action.className = 'record-entry-action-btn';
+                        action.dataset.timestamp = String(timestamp);
+                        action.setAttribute('aria-label', `Edit or delete record ${index + 1}`);
+                        action.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>';
+
+                        row.append(number, dateTime, action);
+                        return row;
+                    });
+                    this.dom.recordsContent.replaceChildren(...recordElements);
 
                     this.dom.recordsContent.querySelectorAll('.record-entry-action-btn').forEach(btn => {
                         btn.addEventListener('click', (e) => {
@@ -660,15 +674,15 @@ class MedicationTracker {
                 if (!med.records || med.records.length === 0) return Infinity;
                 return Date.now() - Math.max(...med.records);
             }
-            getTimeUntilNextDose(med) { const ts = this.getTimeSinceLastDose(med); return Math.max(0, med.timeBetweenHours * 3600000 - ts); }
-            isSafeToConsume(med) { return this.getTimeUntilNextDose(med) === 0; }
-            getProgressRatio(med) { const ts = this.getTimeSinceLastDose(med); return ts === Infinity ? 0 : Math.min(1, ts / (med.timeBetweenHours * 3600000)); }
+            getTimeUntilNextDose(med) { return getMedicationTiming(med).remainingMilliseconds; }
+            isSafeToConsume(med) { return getMedicationTiming(med).ready; }
+            getProgressRatio(med) { return getMedicationTiming(med).progress; }
 
-            getCardColor(medication) {
-                if (this.isSafeToConsume(medication)) {
+            getCardColor(medication, timing = getMedicationTiming(medication)) {
+                if (timing.ready) {
                     return `linear-gradient(135deg, var(--safe-gradient-start) 0%, var(--safe-gradient-end) 100%)`;
                 }
-                const progress = this.getProgressRatio(medication);
+                const progress = timing.progress;
                 const rO = 230, gO = 81, bO = 0;   // Orange
                 const rG = 46, gG = 125, bG = 50;  // Green
                 const r = Math.round(rO + (rG - rO) * progress);
@@ -706,6 +720,12 @@ class MedicationTracker {
                     e.stopPropagation();
                     this.showActionChoiceModal(medication);
                 });
+                element.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.showActionChoiceModal(medication);
+                    }
+                });
             }
 
 
@@ -716,24 +736,45 @@ class MedicationTracker {
                     container.innerHTML = `<div class="empty-records"><p>No medications added yet.</p><p style="font-size: 14px; margin-top: 8px;">Tap an action below to start.</p></div>`;
                     return;
                 }
-                container.innerHTML = this.medications.map(med => {
-                    const statusText = this.isSafeToConsume(med) ? 'Safe to take now' : `Next dose in: ${this.formatDuration(this.getTimeUntilNextDose(med))}`;
+                const medicationElements = this.medications.map(med => {
+                    const timing = getMedicationTiming(med);
+                    const statusText = timing.ready
+                        ? 'Entered wait limits cleared'
+                        : `Wait limits clear in: ${this.formatDuration(timing.remainingMilliseconds)}`;
                     let lastConsumedText = 'Last: Never';
                     if (med.records && med.records.length > 0) {
                         const lastRecordTimestamp = Math.max(...med.records);
                         lastConsumedText = `Last: ${this.formatDateTime(lastRecordTimestamp)}`;
                     }
-                    return `
-                        <div class="medication-item" data-id="${med.id}" style="background: ${this.getCardColor(med)};">
-                            <div class="medication-content-wrapper">
-                                <div class="medication-content">
-                                    <div class="medication-name">${med.name}</div>
-                                    <div class="medication-status">${statusText}</div>
-                                    <div class="medication-last-consumed">${lastConsumedText}</div>
-                                </div>
-                            </div>
-                        </div>`;
-                }).join('');
+                    const item = document.createElement('div');
+                    item.className = 'medication-item';
+                    item.dataset.id = med.id;
+                    item.style.background = this.getCardColor(med, timing);
+                    item.tabIndex = 0;
+                    item.setAttribute('role', 'button');
+                    item.setAttribute('aria-label', `${med.name}. ${statusText}. ${lastConsumedText}`);
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'medication-content-wrapper';
+                    const content = document.createElement('div');
+                    content.className = 'medication-content';
+
+                    const medicationName = document.createElement('div');
+                    medicationName.className = 'medication-name';
+                    medicationName.textContent = med.name;
+                    const medicationStatus = document.createElement('div');
+                    medicationStatus.className = 'medication-status';
+                    medicationStatus.textContent = statusText;
+                    const lastConsumed = document.createElement('div');
+                    lastConsumed.className = 'medication-last-consumed';
+                    lastConsumed.textContent = lastConsumedText;
+
+                    content.append(medicationName, medicationStatus, lastConsumed);
+                    wrapper.append(content);
+                    item.append(wrapper);
+                    return item;
+                });
+                container.replaceChildren(...medicationElements);
                 container.querySelectorAll('.medication-item').forEach(item => {
                     const med = this.medications.find(m => m.id === item.dataset.id);
                     if (med) this.setupItemSwipeGestures(item, med);
@@ -766,7 +807,24 @@ class MedicationTracker {
                 this.dom.toast.classList.add('active');
                 this.toastTimeout = setTimeout(() => this.dom.toast.classList.remove('active'), 2800);
             }
-            saveMedications() { localStorage.setItem('medications', JSON.stringify(this.medications)); }
+            loadMedications() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('medications') || '[]');
+                    return parseMedicationBackup(saved);
+                } catch (error) {
+                    console.error('Could not read saved medication data:', error);
+                    return [];
+                }
+            }
+
+            saveMedications() {
+                try {
+                    localStorage.setItem('medications', JSON.stringify(this.medications));
+                } catch (error) {
+                    console.error('Could not save medication data:', error);
+                    this.showToast('Could not save your changes. Storage may be full.');
+                }
+            }
         }
 
         const tracker = new MedicationTracker();
